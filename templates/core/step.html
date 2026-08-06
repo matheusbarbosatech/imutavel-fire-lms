@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h3 class="mb-3 text-center">{{ title }}</h3>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  
+  {% for field in form %}
+    <div class="mb-3 {% if field.field.widget.input_type == 'checkbox' %}form-check{% endif %}">
+      {% if field.field.widget.input_type == 'checkbox' %}
+        <div class="d-flex align-items-start">
+          {{ field }}
+          <label class="form-check-label ms-2 fw-bold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        </div>
+      {% else %}
+        <label class="form-label fw-bold">{{ field.label }}</label>
+        {{ field }}
+      {% endif %}
+      
+      {% if field.help_text %}
+        <small class="text-muted d-block mt-1">{{ field.help_text }}</small>
+      {% endif %}
+      {% if field.errors %}
+        <div class="text-danger small mt-1">{{ field.errors }}</div>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  {% if step == 4 %}
+  <div class="alert alert-info small mb-3">
+    <strong>💡 Importante:</strong> Ao clicar em finalizar, você confirma a veracidade dos dados e documentos enviados.
+  </div>
+  {% endif %}
+
+  <button type="submit" class="btn btn-success w-100 mt-3 py-2">
+    {% if step == 4 %}✅ Finalizar Matrícula{% else %}Próximo →{% endif %}
+  </button>
+</form>
+{% endblock %}

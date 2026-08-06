@@ -1,0 +1,8 @@
+Django>=4.2,<5.0
+psycopg2-binary
+supabase
+python-decouple
+validate-docbr
+Pillow
+gunicorn
+whitenoise

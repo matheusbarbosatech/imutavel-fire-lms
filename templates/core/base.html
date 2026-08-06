@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matrícula Online</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f9fa; }
+    .step-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; }
+    .active { background: #0d6efd; color: #fff; }
+    .done { background: #198754; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="card shadow mx-auto" style="max-width:750px">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">📝 Sistema de Matrícula Online</h4>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-center mb-4 gap-2">
+          {% for i in "1234" %}
+            <span class="step-badge {% if step == forloop.counter %}active{% elif step > forloop.counter %}done{% else %}bg-light text-muted{% endif %}">
+              Passo {{ forloop.counter }}
+            </span>
+          {% endfor %}
+        </div>
+        {% if messages %}
+          {% for m in messages %}
+            <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+          {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
