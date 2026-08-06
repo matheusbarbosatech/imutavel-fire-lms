@@ -4,7 +4,6 @@ import traceback
 from datetime import date
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.conf import settings
 from supabase import create_client
 from .forms import Step1Form, Step2Form, Step3Form, Step4Form
@@ -72,6 +71,7 @@ def passo_3(request):
                 if not supabase:
                     messages.error(request, 'Erro ao conectar com o servidor. Tente novamente.')
                     return redirect('passo_3')
+                
                 uploaded_files = {}
                 for key, file in form.cleaned_data.items():
                     try:
@@ -79,6 +79,7 @@ def passo_3(request):
                         file_name = f"temp/{uuid.uuid4().hex}.{file_ext}"
                         file_content = file.read()
                         print(f"📁 [PASSO 3] Upload: {key} -> {file_name} ({len(file_content)} bytes)", flush=True)
+                        
                         supabase.storage.from_(settings.SUPABASE_BUCKET).upload(
                             path=file_name,
                             file=file_content,
@@ -89,6 +90,7 @@ def passo_3(request):
                         print(f"❌ [PASSO 3] Erro no arquivo {key}: {e}", flush=True)
                         messages.error(request, f'Erro ao enviar arquivo: {str(e)}')
                         return redirect('passo_3')
+                
                 request.session['uploaded_files'] = uploaded_files
                 print(f"✅ [PASSO 3] Sucesso! Arquivos: {list(uploaded_files.keys())}", flush=True)
                 return redirect('passo_4')
@@ -107,7 +109,7 @@ def passo_4(request):
     if request.method == 'POST':
         form = Step4Form(request.POST)
         if form.is_valid():
-            mat = None  # CORREÇÃO CRÍTICA 1: Evita UnboundLocalError no bloco except
+            mat = None  # Evita o UnboundLocalError caso quebre no meio do caminho
             try:
                 print("=" * 60, flush=True)
                 print("🚀 [PASSO 4] INICIANDO FINALIZAÇÃO", flush=True)
@@ -116,7 +118,7 @@ def passo_4(request):
                 s1 = {k: _str_to_date(v) for k, v in s1_raw.items()}
                 s2 = request.session.get('step2', {})
                 
-                # CORREÇÃO CRÍTICA 2: Valida CPF repetido ANTES de tentar salvar
+                # VERIFICAÇÃO DE CPF REPETIDO
                 cpf_atual = s1.get('cpf', '')
                 if Matricula.objects.filter(cpf=cpf_atual).exists():
                     messages.error(request, 'Este CPF já possui uma matrícula registrada em nosso sistema.')
@@ -127,6 +129,7 @@ def passo_4(request):
                 
                 print(f"👤 [PASSO 4] Criando matrícula para: {s1.get('nome', 'N/A')}", flush=True)
                 
+                # CRIAÇÃO DA MATRÍCULA
                 mat = Matricula.objects.create(
                     nome=s1.get('nome', ''),
                     cpf=cpf_atual,
@@ -141,6 +144,7 @@ def passo_4(request):
                 )
                 print(f"✅ [PASSO 4] Matrícula criada: ID={mat.id}", flush=True)
                 
+                # PROCESSAMENTO DOS ARQUIVOS (MOVENDO DE TEMP PARA DOCS)
                 try:
                     supabase = _get_supabase_client()
                     if supabase:
@@ -159,6 +163,7 @@ def passo_4(request):
                                     file_options={"content-type": "application/octet-stream", "upsert": "true"}
                                 )
                                 
+                                # Tenta apagar o arquivo temporário
                                 try:
                                     supabase.storage.from_(settings.SUPABASE_BUCKET).remove([temp_path])
                                 except:
@@ -175,17 +180,11 @@ def passo_4(request):
                 except Exception as e:
                     print(f"⚠ [PASSO 4] Erro geral no processamento de arquivos: {e}", flush=True)
                 
-                try:
-                    send_mail(
-                        subject='Matrícula Recebida - IMUTÁVEL FIRE',
-                        message=f'Olá {mat.nome},\n\nSua matrícula foi recebida com sucesso!\nProtocolo: #{mat.id}\n\nEm breve entraremos em contato.\n\nAtenciosamente,\nEquipe IMUTÁVEL FIRE',
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[mat.email],
-                        fail_silently=True
-                    )
-                    print("📧 [PASSO 4] E-mail enviado", flush=True)
-                except Exception as e:
-                    print(f"⚠ [PASSO 4] Falha ao enviar email: {e}", flush=True)
+                # =========================================================
+                # ENVIO DE E-MAIL DESATIVADO AQUI (Comentado)
+                # O Render no plano free bloqueia a porta SMTP e trava o app
+                # =========================================================
+                print("📧 [PASSO 4] Envio de e-mail pulado devido a limitação do servidor (Render Free)", flush=True)
                 
                 print("🎉 SUCESSO TOTAL, redirecionando!", flush=True)
                 _clean_session(request)
@@ -195,7 +194,7 @@ def passo_4(request):
             except Exception as e:
                 print(f"❌ [PASSO 4] ERRO CRÍTICO: {str(e)}", flush=True)
                 print(traceback.format_exc(), flush=True)
-                if mat:  # Agora não causará UnboundLocalError
+                if mat: 
                     _clean_session(request)
                     messages.warning(request, 'Sua inscrição foi salva, mas houve um erro interno de processamento dos arquivos.')
                     return redirect('sucesso')
