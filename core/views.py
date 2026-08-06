@@ -122,7 +122,7 @@ def passo_4(request):
                 )
                 print(f"✅ [PASSO 4] Matrícula criada: ID={mat.id}")
                 
-                # 2. Processar arquivos (UPLOAD DIRETO NO SUPABASE)
+                # 2. Processar arquivos
                 supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY)
                 uploaded_files = request.session['uploaded_files']
                 
@@ -134,7 +134,7 @@ def passo_4(request):
                     file_content = supabase.storage.from_(settings.SUPABASE_BUCKET).download(temp_path)
                     print(f"   ✓ Download: {len(file_content)} bytes")
                     
-                    # Upload direto para pasta final (sem passar pelo Django FileField)
+                    # Upload direto para pasta final
                     ext = temp_path.split('.')[-1]
                     final_path = f"docs/{tipo}_{mat.id}.{ext}"
                     
@@ -152,10 +152,12 @@ def passo_4(request):
                     except Exception as e:
                         print(f"   ⚠ Aviso ao deletar temp: {e}")
                     
-                    # Criar registro no banco (salvar apenas o caminho)
-                    doc = Documento(matricula=mat, tipo=tipo)
-                    doc.arquivo.name = final_path  # ✅ Atribuição direta do path
-                    doc.save()
+                    # ✅ SIMPLIFICADO: salvar apenas o caminho
+                    Documento.objects.create(
+                        matricula=mat,
+                        tipo=tipo,
+                        arquivo=final_path
+                    )
                     print(f"   ✓ Documento salvo no banco")
                 
                 # 3. Enviar e-mail (opcional)
