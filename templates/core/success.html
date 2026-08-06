@@ -1,9 +1,14 @@
 {% extends "core/base.html" %}
 {% block content %}
-<div class="text-center py-4">
-  <h2 class="text-success mb-3">✅ Matrícula Recebida!</h2>
-  <p class="text-muted">Seu protocolo foi registrado. Aguarde a análise da secretaria.</p>
-  <p>Verifique seu e-mail para confirmar o recebimento.</p>
-  <a href="{% url 'passo_1' %}" class="btn btn-outline-primary mt-3">Nova Inscrição</a>
+<div class="text-center py-5">
+    <div style="font-size: 5rem;">🎉</div>
+    <h2 class="text-success mt-3 mb-4">Matrícula Realizada com Sucesso!</h2>
+    <p class="lead">Sua inscrição foi recebida e está em análise.</p>
+    <p class="text-muted">Em breve entraremos em contato pelo e-mail e telefone informados.</p>
+    <hr class="my-4">
+    <p class="small text-muted">Guarde seus dados para acompanhamento.</p>
+    <a href="{% url 'passo_1' %}" class="btn btn-outline-primary mt-3">
+        Fazer Nova Inscrição
+    </a>
 </div>
 {% endblock %}
