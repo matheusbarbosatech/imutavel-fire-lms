@@ -122,7 +122,7 @@ def passo_4(request):
                 )
                 print(f"✅ [PASSO 4] Matrícula criada: ID={mat.id}")
                 
-                # 2. Processar arquivos
+                # 2. Processar arquivos (UPLOAD DIRETO NO SUPABASE)
                 supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY)
                 uploaded_files = request.session['uploaded_files']
                 
@@ -130,17 +130,20 @@ def passo_4(request):
                     tipo = key.replace('_file', '')
                     print(f"📥 [PASSO 4] Processando {tipo} de {temp_path}")
                     
-                    # Baixar do Supabase
+                    # Baixar do Supabase (pasta temp)
                     file_content = supabase.storage.from_(settings.SUPABASE_BUCKET).download(temp_path)
                     print(f"   ✓ Download: {len(file_content)} bytes")
                     
-                    # Criar documento no banco
-                    doc = Documento(matricula=mat, tipo=tipo)
-                    file_name = f"{tipo}_{mat.id}.{temp_path.split('.')[-1]}"
+                    # Upload direto para pasta final (sem passar pelo Django FileField)
+                    ext = temp_path.split('.')[-1]
+                    final_path = f"docs/{tipo}_{mat.id}.{ext}"
                     
-                    # Salvar usando ContentFile
-                    doc.arquivo.save(file_name, ContentFile(file_content), save=True)
-                    print(f"   ✓ Salvo: {doc.arquivo.name}")
+                    supabase.storage.from_(settings.SUPABASE_BUCKET).upload(
+                        path=final_path,
+                        file=file_content,
+                        file_options={"content-type": "application/octet-stream", "upsert": "true"}
+                    )
+                    print(f"   ✓ Upload final: {final_path}")
                     
                     # Deletar arquivo temporário
                     try:
@@ -148,6 +151,12 @@ def passo_4(request):
                         print(f"   ✓ Temp deletado")
                     except Exception as e:
                         print(f"   ⚠ Aviso ao deletar temp: {e}")
+                    
+                    # Criar registro no banco (salvar apenas o caminho)
+                    doc = Documento(matricula=mat, tipo=tipo)
+                    doc.arquivo.name = final_path  # ✅ Atribuição direta do path
+                    doc.save()
+                    print(f"   ✓ Documento salvo no banco")
                 
                 # 3. Enviar e-mail (opcional)
                 print(f"📧 [PASSO 4] Enviando e-mail para {mat.email}")
@@ -161,7 +170,7 @@ def passo_4(request):
                     )
                     print("✅ [PASSO 4] E-mail enviado!")
                 except Exception as e:
-                    print(f"⚠ [PASSO 4] Falha no e-mail: {e}")
+                    print(f"⚠ [PASSO 4] Falha no e-mail (não bloqueia): {e}")
                 
                 print("=" * 50)
                 print("🎉 [PASSO 4] SUCESSO TOTAL!")
