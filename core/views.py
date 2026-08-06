@@ -153,130 +153,37 @@ def passo_4(request):
     if request.method == 'POST':
         form = Step4Form(request.POST)
         if form.is_valid():
-            mat = None  # Variável para rastrear se a matrícula foi criada
-            
             try:
-                print("=" * 60)
-                print("🚀 [PASSO 4] INICIANDO FINALIZAÇÃO")
-                print("=" * 60)
-                
-                # Recuperar dados da sessão
                 s1_raw = request.session.get('step1', {})
                 s1 = {k: _str_to_date(v) for k, v in s1_raw.items()}
                 s2 = request.session.get('step2', {})
                 
-                # IP e User-Agent
                 ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '127.0.0.1')).split(',')[0].strip()
                 ua = request.META.get('HTTP_USER_AGENT', 'unknown')[:500]
                 
-                print(f"👤 [PASSO 4] Criando matrícula para: {s1.get('nome', 'N/A')}")
-                
-                # ========================================
-                # 1. CRIAR MATRÍCULA (BLOCO CRÍTICO)
-                # ========================================
+                # 1. Criar a matrícula (Já sabemos que isso funciona)
                 mat = Matricula.objects.create(
-                    nome=s1.get('nome', ''),
-                    cpf=s1.get('cpf', ''),
-                    rg=s1.get('rg', ''),
-                    nascimento=s1.get('nascimento'),
-                    email=s2.get('email', ''),
-                    telefone=s2.get('telefone', ''),
-                    endereco=s2.get('endereco', ''),
-                    aceitou_termos=True,
-                    ip_registro=ip,
-                    user_agent=ua
+                    nome=s1.get('nome', ''), cpf=s1.get('cpf', ''), rg=s1.get('rg', ''), 
+                    nascimento=s1.get('nascimento'), email=s2.get('email', ''), 
+                    telefone=s2.get('telefone', ''), endereco=s2.get('endereco', ''),
+                    aceitou_termos=True, ip_registro=ip, user_agent=ua
                 )
-                print(f"✅ [PASSO 4] Matrícula criada: ID={mat.id}")
                 
-                # ========================================
-                # 2. PROCESSAR ARQUIVOS (NÃO BLOQUEIA)
-                # ========================================
-                try:
-                    supabase = _get_supabase_client()
-                    if supabase:
-                        uploaded_files = request.session.get('uploaded_files', {})
-                        for key, temp_path in uploaded_files.items():
-                            tipo = key.replace('_file', '')
-                            try:
-                                print(f"📥 [PASSO 4] Processando {tipo}")
-                                file_content = supabase.storage.from_(settings.SUPABASE_BUCKET).download(temp_path)
-                                ext = temp_path.split('.')[-1]
-                                final_path = f"docs/{tipo}_{mat.id}.{ext}"
-                                
-                                supabase.storage.from_(settings.SUPABASE_BUCKET).upload(
-                                    path=final_path,
-                                    file=file_content,
-                                    file_options={"content-type": "application/octet-stream", "upsert": "true"}
-                                )
-                                
-                                try:
-                                    supabase.storage.from_(settings.SUPABASE_BUCKET).remove([temp_path])
-                                except:
-                                    pass
-                                
-                                Documento.objects.create(
-                                    matricula=mat,
-                                    tipo=tipo,
-                                    arquivo=final_path
-                                )
-                                print(f"   ✓ Documento {tipo} salvo")
-                            except Exception as e:
-                                print(f"   ⚠ Erro no arquivo {tipo}: {e}")
-                    else:
-                        print("⚠ [PASSO 4] Supabase indisponível, pulando arquivos")
-                except Exception as e:
-                    print(f"⚠ [PASSO 4] Erro geral no processamento de arquivos: {e}")
-                
-                # ========================================
-                # 3. ENVIAR E-MAIL (TOTALMENTE OPCIONAL)
-                # ========================================
-                try:
-                    send_mail(
-                        subject='Matrícula Recebida - IMUTÁVEL FIRE',
-                        message=f'Olá {mat.nome},\n\nSua matrícula foi recebida com sucesso!\nProtocolo: #{mat.id}\n\nEm breve entraremos em contato.\n\nAtenciosamente,\nEquipe IMUTÁVEL FIRE',
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[mat.email],
-                        fail_silently=True  # ← NUNCA lança exceção
-                    )
-                    print("📧 [PASSO 4] E-mail enviado (ou tentativa feita)")
-                except Exception as e:
-                    print(f"⚠ [PASSO 4] E-mail falhou (não bloqueia): {e}")
-                
-                # ========================================
-                # 4. FINALIZAR E REDIRECIONAR
-                # ========================================
-                print("=" * 60)
-                print("🎉 [PASSO 4] SUCESSO TOTAL!")
-                print("=" * 60)
-                
+                # 2. Limpar sessão
                 _clean_session(request)
-                messages.success(request, '✅ Matrícula enviada com sucesso!')
-                return redirect('sucesso')
+                
+                # 3. Redirecionamento DIRETO e simples
+                from django.http import HttpResponseRedirect
+                from django.urls import reverse
+                return HttpResponseRedirect(reverse('sucesso'))
                 
             except Exception as e:
-                print("=" * 60)
-                print(f"❌ [PASSO 4] ERRO CRÍTICO: {str(e)}")
-                print(traceback.format_exc())
-                print("=" * 60)
-                
-                # SE A MATRÍCULA FOI CRIADA, VAI PARA SUCESSO MESMO ASSIM
-                if mat:
-                    print("⚠ [PASSO 4] Matrícula foi criada, redirecionando para sucesso")
-                    _clean_session(request)
-                    messages.warning(request, 'Matrícula salva! Houve um pequeno erro no processamento, mas sua inscrição foi registrada.')
-                    return redirect('sucesso')
-                
-                # SE NÃO FOI CRIADA, MOSTRA ERRO E VOLTA
-                messages.error(request, f'Erro ao finalizar: {str(e)}')
-                return redirect('passo_4')
-    else:
-        form = Step4Form()
+                # Se der erro, mostra na tela em vez de 500
+                from django.http import HttpResponse
+                return HttpResponse(f"<h1>Erro ao salvar:</h1><p>{str(e)}</p><a href='/'>Voltar</a>")
     
-    return render(request, 'core/step.html', {
-        'form': form,
-        'step': 4,
-        'title': '✍️ Confirmação e Termos'
-    })
+    form = Step4Form()
+    return render(request, 'core/step.html', {'form': form, 'step': 4, 'title': '✍️ Confirmação e Termos'})
 
 # ============================================================
 # PÁGINA DE SUCESSO

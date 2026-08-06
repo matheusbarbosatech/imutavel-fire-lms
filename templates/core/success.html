@@ -1,14 +1,20 @@
-{% extends "core/base.html" %}
-{% block content %}
-<div class="text-center py-5">
-    <div style="font-size: 5rem;">🎉</div>
-    <h2 class="text-success mt-3 mb-4">Matrícula Realizada com Sucesso!</h2>
-    <p class="lead">Sua inscrição foi recebida e está em análise.</p>
-    <p class="text-muted">Em breve entraremos em contato pelo e-mail e telefone informados.</p>
-    <hr class="my-4">
-    <p class="small text-muted">Guarde seus dados para acompanhamento.</p>
-    <a href="{% url 'passo_1' %}" class="btn btn-outline-primary mt-3">
-        Fazer Nova Inscrição
-    </a>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Sucesso - IMUTÁVEL FIRE</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f4f4f4; }
+        .box { background: white; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #28a745; }
+        a { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>✅ Matrícula Realizada com Sucesso!</h1>
+        <p>Seus dados foram salvos e estão em análise.</p>
+        <a href="/">Fazer Nova Inscrição</a>
+    </div>
+</body>
+</html>
