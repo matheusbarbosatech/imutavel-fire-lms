@@ -9,6 +9,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
+        key: PYTHONUNBUFFERED    # 👈 ADICIONE ESTA LINHA
+        value: "1"               # 👈 ADICIONE ESTA LINHA
       - key: DEBUG
         value: "False"
       - key: SECRET_KEY
