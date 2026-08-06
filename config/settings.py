@@ -48,23 +48,22 @@ TEMPLATES = [{
 }]
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# 🗄️ BANCO DE DADOS - CONFIGURAÇÃO À PROVA DE FALHAS
-# ✅ Produção: valores hardcoded (Render)
-# ✅ Desenvolvimento: fallback para .env
+# 🗄️ BANCO DE DADOS - CONFIGURAÇÃO CORRIGIDA
 if not DEBUG:
-    # PRODUÇÃO (Render) - HARDCODED PARA EVITAR CONFLITOS
+    # PRODUÇÃO (Render) - HARDCODED
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'postgres',
             'USER': 'postgres',
-            'PASSWORD': 'SenhaMatricula2026!',  # ← Sua senha real do Supabase
+            'PASSWORD': 'SenhaMatricula2026!',
             'HOST': 'db.taddgzgbgstttecbvkmc.supabase.co',
-            'PORT': '6543',  # ← Porta de Connection Pooling (NÃO 5432)
+            'PORT': '6543',  # ← Porta de Connection Pooling
             'OPTIONS': {
                 'sslmode': 'require',
-                'prefer_ipv6': False,  # ← Força IPv4 (evita "Network unreachable")
                 'connect_timeout': 15,
+                # ✅ Forçar IPv4 via opção PostgreSQL (válido para psycopg2)
+                'options': '-c prefer_ipv6=off',
             }
         }
     }
@@ -80,8 +79,8 @@ else:
             'PORT': config('DB_PORT', default='6543'),
             'OPTIONS': {
                 'sslmode': 'require',
-                'prefer_ipv6': False,
                 'connect_timeout': 15,
+                'options': '-c prefer_ipv6=off',
             }
         }
     }
