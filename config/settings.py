@@ -48,39 +48,38 @@ TEMPLATES = [{
 }]
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# 🗄️ BANCO DE DADOS - CONFIGURAÇÃO CORRIGIDA
+# 🗄️ BANCO DE DADOS - USANDO POOLER DO SUPABASE (IPv4 garantido)
 if not DEBUG:
-    # PRODUÇÃO (Render) - HARDCODED
+    # PRODUÇÃO (Render) - USA O POOLER DO SUPABASE
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'postgres',
-            'USER': 'postgres',
+            # ⚠️ USUÁRIO DO POOLER: postgres.[project-ref]
+            'USER': 'postgres.taddgzgbgstttecbvkmc',
             'PASSWORD': 'SenhaMatricula2026!',
-            'HOST': 'db.taddgzgbgstttecbvkmc.supabase.co',
-            'PORT': '6543',  # ← Porta de Connection Pooling
+            # ⚠️ HOST DO POOLER: substitua pelo que você copiou do Supabase
+            'HOST': 'aws-0-us-east-1.pooler.supabase.com',  # ← COLE O SEU HOST DO POOLER AQUI
+            'PORT': '6543',
             'OPTIONS': {
                 'sslmode': 'require',
                 'connect_timeout': 15,
-                # ✅ Forçar IPv4 via opção PostgreSQL (válido para psycopg2)
-                'options': '-c prefer_ipv6=off',
             }
         }
     }
 else:
-    # DESENVOLVIMENTO LOCAL - Lê do .env
+    # DESENVOLVIMENTO LOCAL
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': config('DB_NAME', default='postgres'),
-            'USER': config('DB_USER', default='postgres'),
+            'USER': config('DB_USER', default='postgres.taddgzgbgstttecbvkmc'),
             'PASSWORD': config('DB_PASSWORD', default='SenhaMatricula2026!'),
-            'HOST': config('DB_HOST', default='db.taddgzgbgstttecbvkmc.supabase.co'),
+            'HOST': config('DB_HOST', default='aws-0-us-east-1.pooler.supabase.com'),
             'PORT': config('DB_PORT', default='6543'),
             'OPTIONS': {
                 'sslmode': 'require',
                 'connect_timeout': 15,
-                'options': '-c prefer_ipv6=off',
             }
         }
     }

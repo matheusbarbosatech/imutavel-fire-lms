@@ -7,17 +7,14 @@ services:
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
     startCommand: gunicorn config.wsgi:application
     envVars:
-      # ===== DJANGO =====
       - key: PYTHON_VERSION
         value: "3.11"
       - key: DEBUG
-        value: "False"  # ← CRÍTICO: ativa bloco de produção no settings.py
+        value: "False"
       - key: SECRET_KEY
         sync: false
       - key: ALLOWED_HOSTS
         sync: false
-      
-      # ===== E-MAIL =====
       - key: EMAIL_HOST
         value: "smtp-relay.brevo.com"
       - key: EMAIL_PORT
@@ -26,23 +23,20 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
-      
-      # ===== STORAGE =====
       - key: SUPABASE_URL
         value: "https://taddgzgbgstttecbvkmc.supabase.co"
       - key: SUPABASE_SERVICE_KEY
         sync: false
       - key: SUPABASE_BUCKET
         value: "matricula-docs"
-      
-      # ===== BANCO (apenas como fallback, não usado se DEBUG=False) =====
-      - key: DB_NAME
-        value: "postgres"
-      - key: DB_USER
-        value: "postgres"
-      - key: DB_PASSWORD
-        value: "SenhaMatricula2026!"
+      # Pooler do Supabase
       - key: DB_HOST
-        value: "db.taddgzgbgstttecbvkmc.supabase.co"
+        value: "aws-0-us-east-1.pooler.supabase.com"  # ← MESMO HOST DO POOLER
       - key: DB_PORT
         value: "6543"
+      - key: DB_USER
+        value: "postgres.taddgzgbgstttecbvkmc"
+      - key: DB_PASSWORD
+        value: "SenhaMatricula2026!"
+      - key: DB_NAME
+        value: "postgres"
