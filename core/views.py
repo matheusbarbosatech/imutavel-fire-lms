@@ -1,4 +1,4 @@
-import os, uuid
+import os, uuid, traceback
 from pathlib import Path
 from datetime import date
 from django.shortcuts import render, redirect
@@ -60,31 +60,32 @@ def passo_3(request):
     if request.method == 'POST':
         form = Step3Form(request.POST, request.FILES)
         if form.is_valid():
-            # ✅ SALVAR DIRETO NO SUPABASE (sem usar disco local)
             try:
+                print("📤 [PASSO 3] Iniciando upload para Supabase...")
                 supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY)
                 uploaded_files = {}
                 
                 for key, file in form.cleaned_data.items():
-                    # Gerar nome único
                     file_ext = file.name.split('.')[-1]
                     file_name = f"temp/{uuid.uuid4().hex}.{file_ext}"
-                    
-                    # Upload direto para Supabase
                     file_content = file.read()
+                    
+                    print(f"📁 [PASSO 3] Upload: {key} -> {file_name} ({len(file_content)} bytes)")
+                    
                     supabase.storage.from_(settings.SUPABASE_BUCKET).upload(
                         path=file_name,
                         file=file_content,
                         file_options={"content-type": file.content_type}
                     )
-                    
-                    # Salvar apenas o path na sessão (não o arquivo)
                     uploaded_files[key] = file_name
                 
                 request.session['uploaded_files'] = uploaded_files
+                print(f"✅ [PASSO 3] Sucesso! Arquivos: {list(uploaded_files.keys())}")
                 return redirect('passo_4')
                 
             except Exception as e:
+                print(f"❌ [PASSO 3] ERRO: {str(e)}")
+                print(traceback.format_exc())
                 messages.error(request, f'Erro ao fazer upload: {str(e)}')
                 return redirect('passo_3')
     else:
@@ -99,49 +100,57 @@ def passo_4(request):
         form = Step4Form(request.POST)
         if form.is_valid():
             try:
+                print("=" * 50)
+                print("🚀 [PASSO 4] INICIANDO FINALIZAÇÃO")
+                print("=" * 50)
+                
                 s1_raw = request.session['step1']
                 s1 = {k: _str_to_date(v) for k, v in s1_raw.items()}
                 s2 = request.session['step2']
                 
-                # Captura IP e User-Agent
+                # IP e User-Agent
                 ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '127.0.0.1')).split(',')[0].strip()
                 ua = request.META.get('HTTP_USER_AGENT', 'unknown')[:500]
                 
-                # Criar matrícula
+                print(f"👤 [PASSO 4] Criando matrícula para: {s1['nome']}")
+                
+                # 1. Criar matrícula
                 mat = Matricula.objects.create(
                     nome=s1['nome'], cpf=s1['cpf'], rg=s1['rg'], nascimento=s1['nascimento'],
                     email=s2['email'], telefone=s2['telefone'], endereco=s2['endereco'],
                     aceitou_termos=True, ip_registro=ip, user_agent=ua
                 )
+                print(f"✅ [PASSO 4] Matrícula criada: ID={mat.id}")
                 
-                # ✅ MOVER ARQUIVOS DE TEMP PARA PASTA FINAL
+                # 2. Processar arquivos
                 supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY)
+                uploaded_files = request.session['uploaded_files']
                 
-                for key, temp_path in request.session['uploaded_files'].items():
+                for key, temp_path in uploaded_files.items():
                     tipo = key.replace('_file', '')
+                    print(f"📥 [PASSO 4] Processando {tipo} de {temp_path}")
                     
-                    # Baixar do temp
+                    # Baixar do Supabase
                     file_content = supabase.storage.from_(settings.SUPABASE_BUCKET).download(temp_path)
+                    print(f"   ✓ Download: {len(file_content)} bytes")
                     
-                    # Upload para pasta final
-                    final_path = f"docs/{tipo}_{mat.id}.{temp_path.split('.')[-1]}"
-                    supabase.storage.from_(settings.SUPABASE_BUCKET).upload(
-                        path=final_path,
-                        file=file_content,
-                        file_options={"content-type": "application/octet-stream"}
-                    )
+                    # Criar documento no banco
+                    doc = Documento(matricula=mat, tipo=tipo)
+                    file_name = f"{tipo}_{mat.id}.{temp_path.split('.')[-1]}"
+                    
+                    # Salvar usando ContentFile
+                    doc.arquivo.save(file_name, ContentFile(file_content), save=True)
+                    print(f"   ✓ Salvo: {doc.arquivo.name}")
                     
                     # Deletar arquivo temporário
-                    supabase.storage.from_(settings.SUPABASE_BUCKET).remove([temp_path])
-                    
-                    # Criar registro no banco
-                    Documento.objects.create(
-                        matricula=mat,
-                        tipo=tipo,
-                        arquivo=final_path
-                    )
+                    try:
+                        supabase.storage.from_(settings.SUPABASE_BUCKET).remove([temp_path])
+                        print(f"   ✓ Temp deletado")
+                    except Exception as e:
+                        print(f"   ⚠ Aviso ao deletar temp: {e}")
                 
-                # Enviar e-mail
+                # 3. Enviar e-mail (opcional)
+                print(f"📧 [PASSO 4] Enviando e-mail para {mat.email}")
                 try:
                     send_mail(
                         'Matrícula Recebida',
@@ -150,16 +159,24 @@ def passo_4(request):
                         [mat.email],
                         fail_silently=False
                     )
+                    print("✅ [PASSO 4] E-mail enviado!")
                 except Exception as e:
-                    # Se e-mail falhar, não interrompe o processo
-                    print(f"Erro ao enviar e-mail: {e}")
+                    print(f"⚠ [PASSO 4] Falha no e-mail: {e}")
+                
+                print("=" * 50)
+                print("🎉 [PASSO 4] SUCESSO TOTAL!")
+                print("=" * 50)
                 
                 _clean_session(request)
                 messages.success(request, '✅ Matrícula enviada com sucesso!')
                 return redirect('sucesso')
                 
             except Exception as e:
-                messages.error(request, f'Erro ao finalizar matrícula: {str(e)}')
+                print("=" * 50)
+                print(f"❌ [PASSO 4] ERRO CRÍTICO: {str(e)}")
+                print(traceback.format_exc())
+                print("=" * 50)
+                messages.error(request, f'Erro ao finalizar: {str(e)}')
                 return redirect('passo_4')
     else:
         form = Step4Form()
