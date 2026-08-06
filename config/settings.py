@@ -48,22 +48,49 @@ TEMPLATES = [{
 }]
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# 🗄️ BANCO DE DADOS (SUPABASE - HARDCODED)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'SenhaMatricula2026!',
-        'HOST': 'db.taddgzgbgstttecbvkmc.supabase.co',
-        'PORT': '5432',
-        'OPTIONS': {'sslmode': 'require'},
+# 🗄️ BANCO DE DADOS - CONFIGURAÇÃO À PROVA DE FALHAS
+# ✅ Produção: valores hardcoded (Render)
+# ✅ Desenvolvimento: fallback para .env
+if not DEBUG:
+    # PRODUÇÃO (Render) - HARDCODED PARA EVITAR CONFLITOS
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'PASSWORD': 'SenhaMatricula2026!',  # ← Sua senha real do Supabase
+            'HOST': 'db.taddgzgbgstttecbvkmc.supabase.co',
+            'PORT': '6543',  # ← Porta de Connection Pooling (NÃO 5432)
+            'OPTIONS': {
+                'sslmode': 'require',
+                'prefer_ipv6': False,  # ← Força IPv4 (evita "Network unreachable")
+                'connect_timeout': 15,
+            }
+        }
     }
-}
+else:
+    # DESENVOLVIMENTO LOCAL - Lê do .env
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='postgres'),
+            'USER': config('DB_USER', default='postgres'),
+            'PASSWORD': config('DB_PASSWORD', default='SenhaMatricula2026!'),
+            'HOST': config('DB_HOST', default='db.taddgzgbgstttecbvkmc.supabase.co'),
+            'PORT': config('DB_PORT', default='6543'),
+            'OPTIONS': {
+                'sslmode': 'require',
+                'prefer_ipv6': False,
+                'connect_timeout': 15,
+            }
+        }
+    }
 
+# 🔐 VALIDAÇÃO DE SENHA
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
 ]
+
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
@@ -84,7 +111,7 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = 'Matrículas <naoresponda@seudominio.com>'
 
-# ☁️ STORAGE (SUPABASE)
+# ☁️ STORAGE
 SUPABASE_URL = config('SUPABASE_URL', default='https://taddgzgbgstttecbvkmc.supabase.co')
 SUPABASE_SERVICE_KEY = config('SUPABASE_SERVICE_KEY', default='')
 SUPABASE_BUCKET = config('SUPABASE_BUCKET', default='matricula-docs')
@@ -95,3 +122,7 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    X_FRAME_OPTIONS = 'DENY'
