@@ -35,7 +35,7 @@ class Matricula(models.Model):
         return f"{self.nome} ({self.cpf})"
 
 class Documento(models.Model):
-    TIPOS = [('rg', 'RG'), ('cpf', 'CPF'), ('foto', 'Foto 3x4')]
+    TIPOS = [('rg', 'RG'), ('cpf', 'CPF')]
     matricula = models.ForeignKey(Matricula, on_delete=models.CASCADE, related_name='docs')
     tipo = models.CharField('Tipo', max_length=10, choices=TIPOS)
     arquivo = models.FileField('Arquivo', upload_to='docs/', validators=[FileExtensionValidator(['pdf','jpg','jpeg','png'])])

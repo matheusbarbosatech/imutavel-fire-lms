@@ -5,22 +5,35 @@ class Step1Form(forms.ModelForm):
     class Meta:
         model = Matricula
         fields = ['nome', 'cpf', 'rg', 'nascimento']
-        widgets = {'nascimento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})}
+        widgets = {
+            'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome completo'}),
+            'cpf': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '000.000.000-00'}),
+            'rg': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '00.000.000-0'}),
+            'nascimento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        }
 
 class Step2Form(forms.ModelForm):
     class Meta:
         model = Matricula
         fields = ['email', 'telefone', 'endereco']
         widgets = {
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'seu@email.com'}),
             'telefone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '(00) 00000-0000'}),
-            'endereco': forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
+            'endereco': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Rua, número, bairro, cidade - UF'})
         }
 
 class Step3Form(forms.Form):
-    rg_file = forms.FileField(label='RG (Frente e Verso)', widget=forms.FileInput(attrs={'class': 'form-control'}))
-    cpf_file = forms.FileField(label='CPF', widget=forms.FileInput(attrs={'class': 'form-control'}))
-    foto_file = forms.FileField(label='Foto 3x4 Recente', widget=forms.FileInput(attrs={'class': 'form-control'}))
+    # ✅ REMOVIDO: foto_file (não é mais necessário)
+    rg_file = forms.FileField(
+        label='RG (Frente e Verso)',
+        help_text='Envie um arquivo PDF ou imagem legível do RG',
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*,application/pdf'})
+    )
+    cpf_file = forms.FileField(
+        label='CPF',
+        help_text='Envie um arquivo PDF ou imagem legível do CPF',
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*,application/pdf'})
+    )
 
 class Step4Form(forms.Form):
     aceitou_termos = forms.BooleanField(
