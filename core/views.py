@@ -39,6 +39,10 @@ def landing_page(request):
     return render(request, 'core/landing.html')
 
 def passo_1(request):
+    # SE O USUÁRIO ACESSOU O PASSO 1 PELA PRIMEIRA VEZ (GET), LIMPAMOS A SESSÃO CORRETAMENTE
+    if request.method == 'GET':
+        _clean_session(request)
+
     if request.method == 'POST':
         form = Step1Form(request.POST)
         if form.is_valid():
