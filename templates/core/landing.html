@@ -32,57 +32,10 @@
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
+      background-attachment: fixed;
       padding: 100px 20px 80px;
       text-align: center;
       border-bottom: 5px solid var(--gold);
-    }
-
-    /* =========================================
-       HERO SECTION (Versão Celular - Troca a Imagem)
-       ========================================= */
-    @media (max-width: 768px) {
-      .hero-section {
-        /* No celular, ele puxa a imagem vertical cortada especificamente para o mobile */
-        background: linear-gradient(
-          135deg, 
-          rgba(7, 19, 36, 0.5) 0%, 
-          rgba(17, 42, 70, 0.7) 100%
-        ), url('{% static "img/bombeiro-mobile.png" %}');
-        background-size: cover;
-        background-position: center center;
-        background-attachment: scroll;
-        padding: 70px 15px 50px;
-      }
-      
-      .headline {
-        font-size: 2.1rem;
-        margin-top: 15px;
-      }
-      
-      .subheadline {
-        font-size: 1rem;
-      }
-    }
-      
-      .headline {
-        font-size: 2.1rem;
-        margin-top: 15px;
-      }
-      
-      .subheadline {
-        font-size: 1rem;
-      }
-    }
-
-    .hero-logos img {
-      width: 90px;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 3px solid var(--gold);
-      margin: 0 15px;
-      background: white;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     }
 
     .headline {
@@ -91,7 +44,7 @@
       text-transform: uppercase;
       line-height: 1.1;
       text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
-      margin-top: 30px;
+      margin-top: 20px;
     }
     
     .headline span { color: var(--fire-red); }
@@ -174,7 +127,6 @@
       margin-bottom: 20px;
     }
     
-    /* Preço agressivo */
     .price-box {
       background: #f8f9fa;
       border: 2px dashed var(--fire-red);
@@ -220,40 +172,47 @@
       font-size: 1.1rem;
     }
 
-/* =========================================
-       CORREÇÃO PARA CELULARES (Mobile Responsivo)
+    /* =========================================
+       RESPONSIVIDADE MOBILE (Troca de Imagem)
        ========================================= */
     @media (max-width: 768px) {
       .hero-section {
-        /* Desliga o efeito Parallax que quebra no celular */
-        background-attachment: scroll; 
-        /* Força a imagem a alinhar no centro-topo (para não cortar o capacete) */
-        background-position: center top; 
-        /* Diminui o espaçamento para caber melhor na telinha */
-        padding: 60px 20px 40px; 
+        background: linear-gradient(
+          135deg, 
+          rgba(7, 19, 36, 0.5) 0%, 
+          rgba(17, 42, 70, 0.7) 100%
+        ), url('{% static "img/bombeiro-mobile.png" %}');
+        background-size: cover;
+        background-position: center center;
+        background-attachment: scroll;
+        padding: 70px 15px 50px;
       }
       
-      /* Diminui um pouco o título gigante no celular */
       .headline {
-        font-size: 2.2rem;
-        margin-top: 20px;
+        font-size: 2.1rem;
+        margin-top: 15px;
+      }
+      
+      .subheadline {
+        font-size: 1rem;
       }
       
       .price-highlight {
         font-size: 2.8rem;
       }
     }
-
   </style>
 </head>
 <body>
 
   <!-- 1. HERO SECTION (Atenção) -->
   <header class="hero-section">
-    <div class="hero-logos">
-      <img src="{% static 'img/logo.jpeg' %}" alt="Logo Imutável Fire">
-      <img src="{% static 'img/ong.jpeg' %}" alt="Logo Instituto Via Solidária">
+    <!-- Logomarcas perfeitamente travadas e centralizadas -->
+    <div class="d-flex justify-content-center align-items-center mb-4 flex-wrap" style="gap: 15px;">
+      <img src="{% static 'img/logo.jpeg' %}" alt="Logo Imutável Fire" style="width: 85px; height: 85px; border-radius: 50%; object-fit: cover; border: 3px solid #ffd700; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+      <img src="{% static 'img/ong.jpeg' %}" alt="Logo Instituto Via Solidária" style="width: 85px; height: 85px; border-radius: 50%; object-fit: cover; border: 3px solid #ffd700; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
     </div>
+
     <h1 class="headline">Sua chance de vestir a farda e <span>Mudar de Vida</span></h1>
     <p class="subheadline">Pare de entregar currículos que são ignorados. O mercado de salvamento está sedento por profissionais qualificados. Torne-se um Bombeiro Civil ou Guardião de Piscina e conquiste uma profissão de respeito.</p>
     <a href="{% url 'passo_1' %}" class="btn-pulsing mt-4">GARANTIR MINHA VAGA AGORA</a>
@@ -364,9 +323,9 @@
 
   <!-- FOOTER -->
   <footer class="text-center py-5" style="background-color: #040a14;">
-    <img src="{% static 'img/logo.jpeg' %}" alt="Logo Imutável Fire" style="width: 50px; border-radius: 50%; margin-bottom: 15px;">
+    <img src="{% static 'img/logo.jpeg' %}" alt="Logo Imutável Fire" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;">
     <p class="mb-0 text-white-50 fw-bold">© 2026 IMUTÁVEL FIRE</p>
-    <p class="small text-white-50">CNPJ e Termos Legais | Em parceria com Instituto Via Solidária</p>
+    <p class="small text-white-50">Instituto Via Solidária | Parceria Oficial</p>
     <p class="small mt-3" style="color: var(--gold);">Central de Matrículas: (21) 98409-8397</p>
   </footer>
 
