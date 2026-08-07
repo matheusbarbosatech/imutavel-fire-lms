@@ -24,17 +24,31 @@
        HERO SECTION (A Imagem da IA entra aqui)
        ========================================= */
     .hero-section {
+      /* Deixamos o fundo bem mais leve (0.35 a 0.55) para a foto do bombeiro aparecer bem forte */
       background: linear-gradient(
         135deg, 
-        rgba(7, 19, 36, 0.85) 0%, 
-        rgba(17, 42, 70, 0.95) 100%
+        rgba(7, 19, 36, 0.45) 0%, 
+        rgba(17, 42, 70, 0.65) 100%
       ), url('{% static "img/bombeiro-bg.png" %}');
       background-size: cover;
       background-position: center center;
-      background-attachment: fixed;
+      background-repeat: no-repeat;
       padding: 100px 20px 80px;
       text-align: center;
       border-bottom: 5px solid var(--gold);
+    }
+
+    /* Correção definitiva para celulares */
+    @media (max-width: 768px) {
+      .hero-section {
+        background-attachment: scroll; /* Desliga o efeito 3D que buga no mobile */
+        background-position: 70% center; /* Centraliza perfeitamente no foco do bombeiro */
+        padding: 70px 15px 50px;
+      }
+      
+      .headline {
+        font-size: 2.2rem;
+      }
     }
 
     .hero-logos img {
