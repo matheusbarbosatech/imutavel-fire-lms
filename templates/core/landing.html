@@ -21,10 +21,9 @@
     }
     
     /* =========================================
-       HERO SECTION (A Imagem da IA entra aqui)
+       HERO SECTION (Versão Computador)
        ========================================= */
     .hero-section {
-      /* Deixamos o fundo bem mais leve (0.35 a 0.55) para a foto do bombeiro aparecer bem forte */
       background: linear-gradient(
         135deg, 
         rgba(7, 19, 36, 0.45) 0%, 
@@ -38,15 +37,32 @@
       border-bottom: 5px solid var(--gold);
     }
 
-    /* Correção definitiva para celulares */
+    /* =========================================
+       HERO SECTION (Versão Celular - Troca a Imagem)
+       ========================================= */
     @media (max-width: 768px) {
       .hero-section {
-        background-attachment: scroll; 
-        /* Força a imagem a colar na direita para o bombeiro aparecer na tela do celular */
-        background-position: 85% center; 
+        /* No celular, ele puxa a imagem vertical cortada especificamente para o mobile */
+        background: linear-gradient(
+          135deg, 
+          rgba(7, 19, 36, 0.5) 0%, 
+          rgba(17, 42, 70, 0.7) 100%
+        ), url('{% static "img/bombeiro-mobile.png" %}');
         background-size: cover;
+        background-position: center center;
+        background-attachment: scroll;
         padding: 70px 15px 50px;
       }
+      
+      .headline {
+        font-size: 2.1rem;
+        margin-top: 15px;
+      }
+      
+      .subheadline {
+        font-size: 1rem;
+      }
+    }
       
       .headline {
         font-size: 2.1rem;
