@@ -37,4 +37,17 @@
     {% if step == 4 %}✅ Finalizar Matrícula{% else %}Próximo →{% endif %}
   </button>
 </form>
+
+<script>
+    // Impede o duplo clique e mostra que está carregando
+    document.querySelector('form').addEventListener('submit', function() {
+      const btn = this.querySelector('button[type="submit"]');
+      if (btn) {
+        btn.innerHTML = '⏳ Processando, aguarde...';
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
+      }
+    });
+  </script>
+
 {% endblock %}

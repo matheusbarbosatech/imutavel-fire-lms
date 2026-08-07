@@ -1,6 +1,7 @@
 import os
 import uuid
 import traceback
+import requests  # Importação necessária para a API do Brevo
 from datetime import date
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -109,7 +110,7 @@ def passo_4(request):
     if request.method == 'POST':
         form = Step4Form(request.POST)
         if form.is_valid():
-            mat = None  # Evita o UnboundLocalError caso quebre no meio do caminho
+            mat = None  # Evita o erro caso a criação falhe
             try:
                 print("=" * 60, flush=True)
                 print("🚀 [PASSO 4] INICIANDO FINALIZAÇÃO", flush=True)
@@ -129,7 +130,7 @@ def passo_4(request):
                 
                 print(f"👤 [PASSO 4] Criando matrícula para: {s1.get('nome', 'N/A')}", flush=True)
                 
-                # CRIAÇÃO DA MATRÍCULA
+                # CRIA A MATRÍCULA NO BANCO
                 mat = Matricula.objects.create(
                     nome=s1.get('nome', ''),
                     cpf=cpf_atual,
@@ -144,7 +145,7 @@ def passo_4(request):
                 )
                 print(f"✅ [PASSO 4] Matrícula criada: ID={mat.id}", flush=True)
                 
-                # PROCESSAMENTO DOS ARQUIVOS (MOVENDO DE TEMP PARA DOCS)
+                # PROCESSAMENTO DOS ARQUIVOS (TEMP -> DOCS)
                 try:
                     supabase = _get_supabase_client()
                     if supabase:
@@ -163,7 +164,6 @@ def passo_4(request):
                                     file_options={"content-type": "application/octet-stream", "upsert": "true"}
                                 )
                                 
-                                # Tenta apagar o arquivo temporário
                                 try:
                                     supabase.storage.from_(settings.SUPABASE_BUCKET).remove([temp_path])
                                 except:
@@ -181,12 +181,30 @@ def passo_4(request):
                     print(f"⚠ [PASSO 4] Erro geral no processamento de arquivos: {e}", flush=True)
                 
                 # =========================================================
-                # ENVIO DE E-MAIL DESATIVADO AQUI (Comentado)
-                # O Render no plano free bloqueia a porta SMTP e trava o app
+                # ENVIO DE E-MAIL VIA API REST DO BREVO (Evita bloqueio SMTP)
                 # =========================================================
-                print("📧 [PASSO 4] Envio de e-mail pulado devido a limitação do servidor (Render Free)", flush=True)
+                try:
+                    brevo_key = getattr(settings, 'BREVO_API_KEY', None)
+                    if brevo_key:
+                        payload = {
+                            "sender": {"name": "IMUTÁVEL FIRE", "email": "naoresponda@imutavelfire.com"},
+                            "to": [{"email": mat.email, "name": mat.nome}],
+                            "subject": "Matrícula Recebida - IMUTÁVEL FIRE",
+                            "textContent": f"Olá {mat.nome},\n\nSua matrícula foi recebida com sucesso!\nProtocolo: #{mat.id}\n\nEm breve entraremos em contato.\n\nAtenciosamente,\nEquipe IMUTÁVEL FIRE"
+                        }
+                        headers = {
+                            "accept": "application/json",
+                            "api-key": brevo_key,
+                            "content-type": "application/json"
+                        }
+                        requests.post("https://api.brevo.com/v3/smtp/email", json=payload, headers=headers)
+                        print("📧 [PASSO 4] E-mail enviado com sucesso via API", flush=True)
+                    else:
+                        print("⚠ [PASSO 4] Chave BREVO_API_KEY não encontrada. E-mail não enviado.", flush=True)
+                except Exception as e:
+                    print(f"⚠ [PASSO 4] Falha ao enviar e-mail pela API: {e}", flush=True)
                 
-                print("🎉 SUCESSO TOTAL, redirecionando!", flush=True)
+                print("🎉 SUCESSO TOTAL, redirecionando para a página de sucesso!", flush=True)
                 _clean_session(request)
                 messages.success(request, '✅ Matrícula enviada com sucesso!')
                 return redirect('sucesso')

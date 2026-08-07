@@ -31,6 +31,8 @@ services:
         sync: false
       - key: SUPABASE_BUCKET
         value: "matricula-docs"
+      - key: BREVO_API_KEY
+        sync: false
       # Pooler do Supabase
       - key: DB_HOST
         value: "aws-0-us-east-1.pooler.supabase.com"  # ← MESMO HOST DO POOLER

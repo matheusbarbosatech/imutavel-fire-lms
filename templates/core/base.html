@@ -69,6 +69,28 @@
     .btn-success:hover {
       background: linear-gradient(135deg, #218838 0%, #1aa179 100%);
     }
+    /* =========================================
+       AJUSTES DO CHECKBOX (Passo 4)
+       ========================================= */
+    input[type="checkbox"].form-check-input {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0; /* IMPEDE o texto de esmagar o checkbox */
+      cursor: pointer;
+      margin-top: 0.2rem; /* Alinha a caixinha com a primeira linha do texto */
+      border: 2px solid #6c757d; /* Deixa a borda mais visível */
+    }
+    
+    input[type="checkbox"].form-check-input:checked {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    .form-check-label {
+      cursor: pointer; /* Faz o usuário poder clicar no texto para marcar a caixinha */
+      padding-top: 0.3rem;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>

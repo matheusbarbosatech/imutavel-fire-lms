@@ -6,3 +6,4 @@ validate-docbr
 Pillow
 gunicorn
 whitenoise
+requests

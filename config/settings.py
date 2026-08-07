@@ -150,3 +150,5 @@ LOGGING = {
         },
     },
 }
+
+BREVO_API_KEY = config('BREVO_API_KEY', default='')
