@@ -41,13 +41,20 @@
     /* Correção definitiva para celulares */
     @media (max-width: 768px) {
       .hero-section {
-        background-attachment: scroll; /* Desliga o efeito 3D que buga no mobile */
-        background-position: 70% center; /* Centraliza perfeitamente no foco do bombeiro */
+        background-attachment: scroll; 
+        /* Força a imagem a colar na direita para o bombeiro aparecer na tela do celular */
+        background-position: 85% center; 
+        background-size: cover;
         padding: 70px 15px 50px;
       }
       
       .headline {
-        font-size: 2.2rem;
+        font-size: 2.1rem;
+        margin-top: 15px;
+      }
+      
+      .subheadline {
+        font-size: 1rem;
       }
     }
 
