@@ -4,180 +4,334 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IMUTÁVEL FIRE - Cursos Profissionalizantes</title>
+  <title>IMUTÁVEL FIRE - Sua Carreira no Salvamento</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    :root {
+      --navy-blue: #071324;
+      --fire-red: #e60000;
+      --gold: #ffd700;
+      --green-cta: #28a745;
+    }
     body {
-      background-color: #071324;
+      background-color: var(--navy-blue);
       color: white;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden;
     }
+    
+    /* =========================================
+       HERO SECTION (A Imagem da IA entra aqui)
+       ========================================= */
     .hero-section {
-      /* O truque mágico: Gradiente escuro com transparência (rgba) por cima da imagem */
       background: linear-gradient(
         135deg, 
         rgba(7, 19, 36, 0.85) 0%, 
-        rgba(17, 42, 70, 0.90) 100%
-      ), url('{% static "img/bombeiro-bg.jpeg" %}');
+        rgba(17, 42, 70, 0.95) 100%
+      ), url('{% static "img/bombeiro-bg.jpg" %}');
       background-size: cover;
       background-position: center center;
-      background-attachment: fixed; /* Dá um efeito 3D (parallax) ao rolar a página */
-      padding: 80px 20px;
+      background-attachment: fixed;
+      padding: 100px 20px 80px;
       text-align: center;
-      border-bottom: 5px solid #ffd700;
+      border-bottom: 5px solid var(--gold);
     }
+
     .hero-logos img {
-      width: 100px;
-      height: 100px;
+      width: 90px;
+      height: 90px;
       object-fit: cover;
       border-radius: 50%;
-      border: 3px solid #ffd700;
-      margin: 0 10px;
+      border: 3px solid var(--gold);
+      margin: 0 15px;
       background: white;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     }
-    .btn-matricula {
-      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-      color: white;
-      font-size: 1.3rem;
-      font-weight: bold;
-      padding: 15px 40px;
-      border-radius: 30px;
-      text-transform: uppercase;
-      text-decoration: none;
-      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.5);
-      transition: all 0.3s ease;
-      display: inline-block;
-    }
-    .btn-matricula:hover {
-      transform: scale(1.05);
-      color: white;
-    }
-    .course-card {
-      background: white;
-      color: #071324;
-      border-radius: 15px;
-      padding: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border-top: 5px solid #e60000;
-    }
-    .course-title {
-      color: #e60000;
+
+    .headline {
+      font-size: 3.5rem;
       font-weight: 900;
       text-transform: uppercase;
+      line-height: 1.1;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+      margin-top: 30px;
+    }
+    
+    .headline span { color: var(--fire-red); }
+    
+    .subheadline {
+      font-size: 1.3rem;
+      font-weight: 400;
+      max-width: 800px;
+      margin: 20px auto;
+      color: #e0e0e0;
+    }
+
+    /* =========================================
+       BOTÕES E CTAs (Call to Action)
+       ========================================= */
+    .btn-pulsing {
+      background: linear-gradient(135deg, var(--green-cta) 0%, #1e7e34 100%);
+      color: white;
+      font-size: 1.4rem;
+      font-weight: 900;
+      padding: 18px 45px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      text-decoration: none;
+      box-shadow: 0 0 20px rgba(40, 167, 69, 0.6);
+      transition: all 0.3s ease;
+      display: inline-block;
+      animation: pulse 2s infinite;
+      border: 2px solid #34ce57;
+    }
+    .btn-pulsing:hover {
+      transform: scale(1.05);
+      color: white;
+      box-shadow: 0 0 30px rgba(40, 167, 69, 0.8);
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+      70% { box-shadow: 0 0 0 20px rgba(40, 167, 69, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
+
+    /* =========================================
+       SEÇÃO DE DOR E SOLUÇÃO (Copywriting)
+       ========================================= */
+    .pain-section {
+      background-color: #112a46;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .pain-text {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .highlight-red { color: var(--fire-red); font-weight: bold; }
+    .highlight-gold { color: var(--gold); font-weight: bold; }
+
+    /* =========================================
+       CARDS DE CURSOS (A Oferta)
+       ========================================= */
+    .course-card {
+      background: white;
+      color: var(--navy-blue);
+      border-radius: 12px;
+      padding: 40px 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .card-bombeiro { border-top: 8px solid var(--fire-red); }
+    .card-guardiao { border-top: 8px solid #0d6efd; }
+
+    .course-title {
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    
+    /* Preço agressivo */
+    .price-box {
+      background: #f8f9fa;
+      border: 2px dashed var(--fire-red);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 25px 0;
+      text-align: center;
     }
     .price-strike {
       text-decoration: line-through;
-      color: #dc3545;
+      color: #6c757d;
       font-size: 1.2rem;
     }
     .price-highlight {
-      font-size: 2.5rem;
+      font-size: 3.5rem;
       font-weight: 900;
-      color: #28a745;
+      color: var(--fire-red);
+      line-height: 1;
     }
-    .feature-list li {
-      margin-bottom: 10px;
+    .feature-list {
+      text-align: left;
       font-size: 1.1rem;
-      font-weight: 500;
     }
-    .gold-text { color: #ffd700; font-weight: bold; }
+    .feature-list li { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;}
+    .feature-list li:last-child { border: none; }
+
+    /* =========================================
+       URGÊNCIA E AUTORIDADE
+       ========================================= */
+    .urgency-section {
+      background: var(--fire-red);
+      padding: 50px 20px;
+      text-align: center;
+    }
+    .authority-badge {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,0.2);
+      display: inline-block;
+      margin: 10px;
+      font-family: monospace;
+      font-size: 1.1rem;
+    }
+
+/* =========================================
+       CORREÇÃO PARA CELULARES (Mobile Responsivo)
+       ========================================= */
+    @media (max-width: 768px) {
+      .hero-section {
+        /* Desliga o efeito Parallax que quebra no celular */
+        background-attachment: scroll; 
+        /* Força a imagem a alinhar no centro-topo (para não cortar o capacete) */
+        background-position: center top; 
+        /* Diminui o espaçamento para caber melhor na telinha */
+        padding: 60px 20px 40px; 
+      }
+      
+      /* Diminui um pouco o título gigante no celular */
+      .headline {
+        font-size: 2.2rem;
+        margin-top: 20px;
+      }
+      
+      .price-highlight {
+        font-size: 2.8rem;
+      }
+    }
+
   </style>
 </head>
 <body>
 
-  <!-- HERO SECTION -->
+  <!-- 1. HERO SECTION (Atenção) -->
   <header class="hero-section">
-    <div class="hero-logos mb-4">
+    <div class="hero-logos">
       <img src="{% static 'img/logo.jpeg' %}" alt="Logo Imutável Fire">
       <img src="{% static 'img/ong.jpeg' %}" alt="Logo Instituto Via Solidária">
     </div>
-    <h1 class="display-4 fw-bold mb-3">IMUTÁVEL FIRE</h1>
-    <p class="lead mb-4">Cursos Profissionalizantes de Alto Padrão - REG 05-092 | RG-CBA XI 07-008</p>
-    <a href="{% url 'passo_1' %}" class="btn-matricula mt-3">🔥 Fazer Matrícula Agora</a>
+    <h1 class="headline">Sua chance de vestir a farda e <span>Mudar de Vida</span></h1>
+    <p class="subheadline">Pare de entregar currículos que são ignorados. O mercado de salvamento está sedento por profissionais qualificados. Torne-se um Bombeiro Civil ou Guardião de Piscina e conquiste uma profissão de respeito.</p>
+    <a href="{% url 'passo_1' %}" class="btn-pulsing mt-4">GARANTIR MINHA VAGA AGORA</a>
+    <p class="mt-3 small text-white-50">⏳ Atenção: Vagas limitadíssimas para a próxima turma.</p>
   </header>
 
-  <!-- CURSOS SECTION -->
-  <div class="container py-5">
+  <!-- 2. AGITAÇÃO E PROBLEMA (Interesse) -->
+  <section class="pain-section">
+    <div class="container">
+      <h2 class="fw-bold mb-4">Você está preparado para agir quando a vida de alguém depender de você?</h2>
+      <p class="pain-text">
+        O mercado não perdoa quem não se especializa. Enquanto a maioria luta por vagas comuns, a área de 
+        <span class="highlight-red">Prevenção e Salvamento</span> cresce todos os dias. Shoppings, indústrias, clubes e eventos exigem por lei a presença de profissionais certificados. 
+        A IMUTÁVEL FIRE, em parceria com o Instituto Via Solidária, vai te entregar o passaporte para essa nova carreira.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. A OFERTA (Desejo) -->
+  <section class="container py-5">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold" style="color: var(--gold);">ESCOLHA SUA NOVA PROFISSÃO</h2>
+      <p class="lead">Formação completa, prática e direto ao ponto.</p>
+    </div>
+
     <div class="row">
-      
-      <!-- CARD BOMBEIRO CIVIL -->
-      <div class="col-md-6">
-        <div class="course-card">
-          <h2 class="course-title h3 mb-3">🚒 Curso Profissional Bombeiro Civil</h2>
-          <div class="alert alert-warning text-center fw-bold">
-            Aula Inaugural: 15 de Agosto de 2026
+      <!-- CURSO 1: BOMBEIRO CIVIL -->
+      <div class="col-lg-6">
+        <div class="course-card card-bombeiro">
+          <div class="text-center">
+            <h3 class="course-title" style="color: var(--fire-red);">Bombeiro Civil</h3>
+            <span class="badge bg-danger fs-6 mb-3">🔥 CURSO PROFISSIONALIZANTE</span>
           </div>
           
-          <ul class="feature-list list-unstyled mt-4">
-            <li>✅ <strong>Incluso:</strong> Camisa do curso</li>
-            <li>✅ <strong>Material:</strong> Apostila em PDF</li>
-            <li>✅ <strong>Formatura:</strong> Certificado de Conclusão</li>
-            <li>✅ <strong>Registro:</strong> Carteira Profissional</li>
+          <ul class="feature-list list-unstyled mt-3">
+            <li>✅ <strong>Uniforme Completo:</strong> Camisa inclusa no pacote</li>
+            <li>✅ <strong>Material Didático:</strong> Apostila exclusiva em PDF</li>
+            <li>✅ <strong>Certificação Oficial:</strong> Certificado de conclusão reconhecido</li>
+            <li>✅ <strong>Identificação:</strong> Carteira Profissional do Bombeiro Civil</li>
           </ul>
 
-          <hr>
-          
-          <h5 class="fw-bold">📅 Turmas Disponíveis:</h5>
-          <p class="mb-1"><strong>Sexta-feira:</strong> 08h às 17h</p>
-          <p class="mb-3"><strong>Sábado:</strong> 08h às 13h</p>
-          
-          <h5 class="fw-bold">📍 Local:</h5>
-          <p>Instituto Via Solidária (Antigo Credec)<br>Estrada do Campinho, n.4700</p>
-          
-          <div class="text-center mt-4 bg-light p-3 rounded">
-            <p class="mb-0">Investimento de <span class="price-strike">R$ 1500</span> por:</p>
+          <div class="price-box">
+            <p class="mb-0 fw-bold text-uppercase">Bolsa de Estudo Exclusiva:</p>
+            <p class="mb-0">De <span class="price-strike">R$ 1.500,00</span> por apenas</p>
             <div class="price-highlight">R$ 750</div>
-            <small class="text-muted">+ R$ 60 Taxa de Inscrição</small>
+            <p class="text-muted small fw-bold mt-2 mb-0">+ R$ 60 de taxa de inscrição</p>
           </div>
+          
+          <div class="alert alert-warning border-warning">
+            <p class="mb-1"><strong>🚀 Aula Inaugural:</strong> Dia 15/08/2026</p>
+            <p class="mb-1"><strong>📍 Local:</strong> Instituto Via Solidária (Antigo Credec) - Estrada do Campinho, 4700</p>
+            <hr>
+            <p class="mb-0 small"><strong>Turma Sexta:</strong> 08h às 17h | <strong>Turma Sábado:</strong> 08h às 13h</p>
+          </div>
+
+          <a href="{% url 'passo_1' %}" class="btn btn-danger w-100 fw-bold py-3 text-uppercase fs-5">Matricular no Bombeiro Civil</a>
         </div>
       </div>
 
-      <!-- CARD GUARDIÃO DE PISCINA -->
-      <div class="col-md-6">
-        <div class="course-card" style="border-top-color: #0d6efd;">
-          <h2 class="course-title h3 mb-3" style="color: #0d6efd;">🏊‍♂️ Guardião de Piscina</h2>
-          <div class="alert alert-info text-center fw-bold">
-            Turma de Agosto (Formação e Renovação)
+      <!-- CURSO 2: GUARDIÃO DE PISCINA -->
+      <div class="col-lg-6">
+        <div class="course-card card-guardiao">
+          <div class="text-center">
+            <h3 class="course-title" style="color: #0d6efd;">Guardião de Piscina</h3>
+            <span class="badge bg-primary fs-6 mb-3">🏊‍♂️ FORMAÇÃO E RENOVAÇÃO</span>
           </div>
           
-          <ul class="feature-list list-unstyled mt-4">
-            <li>✅ <strong>Treinamento Prático:</strong> Com profissionais qualificados</li>
-            <li>✅ <strong>Técnicas de Salvamento:</strong> Essenciais para salvar vidas</li>
-            <li>✅ <strong>Certificação:</strong> Preparo completo para o mercado</li>
+          <ul class="feature-list list-unstyled mt-3">
+            <li>✅ <strong>Treinamento Prático:</strong> Aprenda com profissionais da ativa</li>
+            <li>✅ <strong>Técnicas de Salvamento:</strong> Domine técnicas que salvam vidas</li>
+            <li>✅ <strong>Certificação de Mercado:</strong> Esteja pronto para atuar imediatamente</li>
+            <li>✅ <strong>Renovação:</strong> Atualize seu registro para continuar trabalhando</li>
           </ul>
 
-          <hr>
-          
-          <h5 class="fw-bold">📅 Detalhes da Turma:</h5>
-          <p class="mb-1"><strong>Dias:</strong> Segunda, Terça, Quinta e Sábado</p>
-          <p class="mb-3"><strong>Horário:</strong> 09h às 15h</p>
-          
-          <h5 class="fw-bold">📍 Local:</h5>
-          <p>Campo Grande Atlético Clube<br>Rua Arthur Rios, nº 1270</p>
-          
-          <div class="text-center mt-4 bg-light p-3 rounded">
-            <p class="mb-0">Garanta sua vaga para a área de</p>
-            <div class="h4 fw-bold" style="color: #0d6efd;">Salvamento Aquático</div>
-            <small class="text-muted">Inscrições Abertas</small>
+          <div class="price-box" style="border-color: #0d6efd;">
+            <p class="mb-0 fw-bold text-uppercase" style="color: #0d6efd;">Turma de Agosto Aberta</p>
+            <p class="mb-0 mt-2">Qualifique-se e atue na área de</p>
+            <div class="price-highlight" style="font-size: 2.5rem; color: #0d6efd;">Salvamento Aquático</div>
           </div>
+          
+          <div class="alert alert-info border-info">
+            <p class="mb-1"><strong>🚀 Início:</strong> Turma de Agosto/2026</p>
+            <p class="mb-1"><strong>📍 Local:</strong> Campo Grande Atlético Clube - Rua Arthur Rios, 1270</p>
+            <hr>
+            <p class="mb-0 small"><strong>Dias:</strong> Seg, Ter, Qui e Sáb | <strong>Horário:</strong> 09h às 15h</p>
+          </div>
+
+          <a href="{% url 'passo_1' %}" class="btn btn-primary w-100 fw-bold py-3 text-uppercase fs-5">Matricular no Guardião</a>
         </div>
       </div>
-
     </div>
+  </section>
 
-    <!-- BOTÃO FINAL -->
-    <div class="text-center mt-5">
-      <h3 class="mb-4">Não perca essa oportunidade de qualificação!</h3>
-      <a href="{% url 'passo_1' %}" class="btn-matricula btn-lg">Garantir Minha Vaga ➔</a>
+  <!-- 4. URGÊNCIA E AUTORIDADE (Ação) -->
+  <section class="urgency-section">
+    <div class="container">
+      <h2 class="fw-bold mb-3 text-white">AS VAGAS SÃO RIGOROSAMENTE LIMITADAS</h2>
+      <p class="lead text-white mb-4">Para garantir a excelência do treinamento prático, não podemos colocar muitos alunos por turma. Quem deixar para depois, vai ficar de fora.</p>
+      
+      <div class="mb-4">
+        <span class="authority-badge">REGISTRO INSTITUCIONAL: 05-092</span>
+        <span class="authority-badge">REGISTRO CBA: XI 07-008</span>
+      </div>
+
+      <a href="{% url 'passo_1' %}" class="btn-pulsing bg-white text-danger" style="border-color: white;">EU QUERO GARANTIR MINHA VAGA</a>
     </div>
-  </div>
+  </section>
 
-  <footer class="text-center py-4 border-top border-secondary">
-    <p class="mb-0 text-white-50">© 2026 IMUTÁVEL FIRE - Instituto Via Solidária</p>
-    <p class="small text-white-50">Dúvidas? Ligue: 21 98409-8397</p>
+  <!-- FOOTER -->
+  <footer class="text-center py-5" style="background-color: #040a14;">
+    <img src="{% static 'img/logo.jpeg' %}" alt="Logo Imutável Fire" style="width: 50px; border-radius: 50%; margin-bottom: 15px;">
+    <p class="mb-0 text-white-50 fw-bold">© 2026 IMUTÁVEL FIRE</p>
+    <p class="small text-white-50">CNPJ e Termos Legais | Em parceria com Instituto Via Solidária</p>
+    <p class="small mt-3" style="color: var(--gold);">Central de Matrículas: (21) 98409-8397</p>
   </footer>
 
 </body>
 </html>
-
