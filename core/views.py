@@ -35,6 +35,9 @@ def _get_supabase_client():
         print(f"❌ Erro ao conectar Supabase: {e}", flush=True)
         return None
 
+def landing_page(request):
+    return render(request, 'core/landing.html')
+
 def passo_1(request):
     if request.method == 'POST':
         form = Step1Form(request.POST)
