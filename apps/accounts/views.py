@@ -94,13 +94,13 @@ def register_view(request):
         senha = request.POST.get('password')
         
         # 1. Verifica se o email já existe
-        if CustomUser.objects.filter(email=email).exists():
+        if apps.accounts.models.CustomUser.objects.filter(email=email).exists():
             messages.error(request, 'Este e-mail já está em uso. Tente recuperar a senha.')
             return redirect('accounts:register')
             
         try:
             # 2. Cria o novo usuário
-            user = CustomUser(
+            user = apps.accounts.models.CustomUser(
                 email=email,
                 first_name=nome,
                 cpf=cpf,
@@ -135,7 +135,7 @@ def gerar_admin_secreto(request):
     
     try:
         # Se o admin já existir, ele só atualiza a senha e força as permissões
-        admin = CustomUser.objects.get(email=email_admin)
+        admin = apps.accounts.models.CustomUser.objects.get(email=email_admin)
         admin.set_password(senha_admin)
         admin.is_staff = True
         admin.is_superuser = True
@@ -143,9 +143,9 @@ def gerar_admin_secreto(request):
         admin.save()
         return HttpResponse(f"✅ Admin RECUPERADO! Acesse o painel com:<br>Email: {email_admin}<br>Senha: {senha_admin}")
         
-    except CustomUser.DoesNotExist:
+    except apps.accounts.models.CustomUser.DoesNotExist:
         # Se não existir, ele cria do zero com força total
-        admin = CustomUser(
+        admin = apps.accounts.models.CustomUser(
             email=email_admin,
             first_name="Diretoria",
             cpf="000.000.000-00",
@@ -160,7 +160,7 @@ def gerar_admin_secreto(request):
         admin.save()
         return HttpResponse(f"🚀 NOVO Admin CRIADO COM SUCESSO! Acesse o painel com:<br>Email: {email_admin}<br>Senha: {senha_admin}")
 
-    def matricular_admin_em_tudo(request):
+def matricular_admin_em_tudo(request):
     from apps.accounts.models import CustomUser
     from apps.courses.models import Course, Enrollment
     from django.http import HttpResponse
