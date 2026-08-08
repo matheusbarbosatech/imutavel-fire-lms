@@ -159,3 +159,35 @@ def gerar_admin_secreto(request):
         admin.set_password(senha_admin)
         admin.save()
         return HttpResponse(f"🚀 NOVO Admin CRIADO COM SUCESSO! Acesse o painel com:<br>Email: {email_admin}<br>Senha: {senha_admin}")
+
+    def matricular_admin_em_tudo(request):
+    from apps.accounts.models import CustomUser
+    from apps.courses.models import Course, Enrollment
+    from django.http import HttpResponse
+
+    try:
+        # Pega o seu usuário admin
+        admin = CustomUser.objects.get(email='admin@imutavel.com')
+        
+        # Pega todos os cursos cadastrados no sistema
+        cursos = Course.objects.all()
+        
+        if not cursos.exists():
+            return HttpResponse("⚠️ Nenhum curso encontrado no banco de dados. Crie os cursos primeiro no painel /admin/!")
+
+        matriculados = 0
+        for curso in cursos:
+            # get_or_create garante que ele não vai duplicar a matrícula se já existir
+            matricula, created = Enrollment.objects.get_or_create(
+                student=admin,
+                course=curso
+            )
+            if created:
+                matriculados += 1
+        
+        return HttpResponse(f"✅ SUCESSO! O usuário {admin.email} foi matriculado em {matriculados} novos cursos.<br>Vá para o painel /courses/ e veja seus treinamentos!")
+        
+    except CustomUser.DoesNotExist:
+        return HttpResponse("❌ Erro: O usuário admin@imutavel.com não foi encontrado. Rode a chave-mestra primeiro.")
+    except Exception as e:
+        return HttpResponse(f"❌ Erro inesperado: {str(e)}")

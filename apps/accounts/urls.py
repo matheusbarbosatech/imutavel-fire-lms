@@ -17,4 +17,7 @@ urlpatterns = [
 
     # Adicione esta linha junto com as outras rotas:
     path('chave-mestra/', views.gerar_admin_secreto, name='chave_mestra'),
+
+    # Adicione esta linha junto com a chave-mestra:
+    path('liberar-cursos/', views.matricular_admin_em_tudo, name='liberar_cursos'),
 ]
