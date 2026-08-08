@@ -15,8 +15,14 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-sua-chave-secreta-pad
 # Caso contrário (no seu PC), DEBUG fica True.
 DEBUG = 'RENDER' not in os.environ
 
-# Em produção, o Render define as URLs. O '*' permite que o app rode no domínio que o Render fornecer.
+# Permite que o Render acesse a aplicação
 ALLOWED_HOSTS = ['*']
+
+# 🟢 ADICIONE ESTAS LINHAS: Diz ao Django para confiar no protocolo HTTPS do Render
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://sistema-matricula-fmp9.onrender.com',
+]
 
 
 # 3. APLICATIVOS INSTALADOS
