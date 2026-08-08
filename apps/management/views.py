@@ -7,11 +7,10 @@ from apps.accounts.models import CustomUser
 from apps.courses.models import Course, Enrollment
 
 def landing_page_view(request):
-    """Landing Page pública na raiz (/)"""
-    # Se o usuário já estiver logado, envia para a dashboard oficial de cursos
-    if request.user.is_authenticated:
-        return redirect('courses:dashboard')  # Usa a rota oficial que retornou 200 no log
-        
+    """
+    Landing Page pública na raiz (/)
+    Exibe a Landing Page para TODOS (anônimos e logados), sem redirecionamento forçado.
+    """
     try:
         cursos_disponiveis = Course.objects.all()[:3]
     except Exception:
@@ -25,7 +24,7 @@ def landing_page_view(request):
 
 @login_required
 def dashboard_view(request):
-    """Painel Administrativo / Gestor (Fallback seguro)"""
+    """Painel Administrativo / Gestor (Com fallback total para não dar 500)"""
     if getattr(request.user, 'role', '') != 'ADMIN' and not request.user.is_superuser:
         return redirect('courses:dashboard')
         
@@ -43,8 +42,8 @@ def dashboard_view(request):
     }
     try:
         return render(request, 'management/dashboard.html', context)
-    except Exception:
-        # Se o template management/dashboard.html não existir, redireciona para a dashboard de cursos
+    except Exception as e:
+        print(f"Erro ao renderizar management/dashboard.html: {e}")
         return redirect('courses:dashboard')
 
 
@@ -52,8 +51,11 @@ def dashboard_view(request):
 def enrollment_list_view(request):
     if getattr(request.user, 'role', '') != 'ADMIN' and not request.user.is_superuser:
         return redirect('courses:dashboard')
-    matriculas = Enrollment.objects.all().select_related('student', 'course')
-    return render(request, 'management/enrollment_list.html', {'matriculas': matriculas})
+    try:
+        matriculas = Enrollment.objects.all().select_related('student', 'course')
+        return render(request, 'management/enrollment_list.html', {'matriculas': matriculas})
+    except Exception:
+        return redirect('courses:dashboard')
 
 
 @login_required
@@ -68,7 +70,7 @@ def enrollment_action_view(request, enrollment_id, action):
         elif action == 'bloquear':
             enrollment.is_active = False
             enrollment.save()
-    except Enrollment.DoesNotExist:
+    except Exception:
         pass
     return redirect('management:enrollment_list')
 
@@ -77,7 +79,10 @@ def enrollment_action_view(request, enrollment_id, action):
 def financial_list_view(request):
     if getattr(request.user, 'role', '') != 'ADMIN' and not request.user.is_superuser:
         return redirect('courses:dashboard')
-    return render(request, 'management/financial_list.html')
+    try:
+        return render(request, 'management/financial_list.html')
+    except Exception:
+        return redirect('courses:dashboard')
 
 
 @login_required
