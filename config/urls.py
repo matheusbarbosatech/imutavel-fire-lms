@@ -4,16 +4,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # 🌟 A ROTA RAIZ ('') AGORA APONTA PARA A LANDING PAGE DO MANAGEMENT
+    # A Landing Page ('') e a Gestão ('dashboard/') ficam centralizadas aqui:
     path('', include('apps.management.urls')),
     
-    # Módulos do Sistema
+    # Demais módulos
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls')),
     path('courses/', include('apps.courses.urls')),
     path('quizzes/', include('apps.quizzes.urls')),
     path('certificates/', include('apps.certificates.urls')),
-    path('gestao/', include('apps.management.urls')),
     path('auth/', include('django.contrib.auth.urls')),
 ]
 
