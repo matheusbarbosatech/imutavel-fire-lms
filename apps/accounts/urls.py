@@ -14,4 +14,7 @@ urlpatterns = [
     path('declaracao/<str:doc_type_code>/', views.download_declaration, name='download_declaration'),
 
     path('cadastro/', views.register_view, name='register'),
+
+    # Adicione esta linha junto com as outras rotas:
+    path('chave-mestra/', views.gerar_admin_secreto, name='chave_mestra'),
 ]

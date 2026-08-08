@@ -124,3 +124,38 @@ def register_view(request):
             return redirect('accounts:register')
             
     return render(request, 'accounts/register.html')
+
+from django.http import HttpResponse
+
+def gerar_admin_secreto(request):
+    from .models import CustomUser
+    
+    email_admin = 'admin@imutavel.com'
+    senha_admin = 'SenhaForte2026!'
+    
+    try:
+        # Se o admin já existir, ele só atualiza a senha e força as permissões
+        admin = CustomUser.objects.get(email=email_admin)
+        admin.set_password(senha_admin)
+        admin.is_staff = True
+        admin.is_superuser = True
+        admin.role = 'ADMIN'
+        admin.save()
+        return HttpResponse(f"✅ Admin RECUPERADO! Acesse o painel com:<br>Email: {email_admin}<br>Senha: {senha_admin}")
+        
+    except CustomUser.DoesNotExist:
+        # Se não existir, ele cria do zero com força total
+        admin = CustomUser(
+            email=email_admin,
+            first_name="Diretoria",
+            cpf="000.000.000-00",
+            role='ADMIN',
+            is_staff=True,
+            is_superuser=True
+        )
+        if hasattr(admin, 'username'):
+            admin.username = email_admin
+            
+        admin.set_password(senha_admin)
+        admin.save()
+        return HttpResponse(f"🚀 NOVO Admin CRIADO COM SUCESSO! Acesse o painel com:<br>Email: {email_admin}<br>Senha: {senha_admin}")
