@@ -16,8 +16,8 @@
                 extend: {
                     colors: {
                         'fire-red': '#E53E3E',
-                        'fire-dark': '#1A202C',
-                        'fire-gold': '#ECC94B',
+                        'fire-dark': '#111827',
+                        'fire-gold': '#F59E0B',
                     }
                 }
             }
@@ -29,45 +29,50 @@
     <!-- Header / Navbar -->
     <header class="bg-white shadow-md py-4 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <img src="{% static 'img/logo.jpeg.jpeg' %}" alt="Logo Imutável Fire" class="h-16 w-auto object-contain">
-                <div class="hidden md:block">
-                    <h1 class="text-xl font-bold text-fire-dark">IMUTÁVEL FIRE</h1>
-                    <p class="text-sm text-gray-500">Registro: REG 05-092</p>
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-fire-red text-white rounded-xl flex items-center justify-center text-2xl shadow-md">
+                    <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-fire-dark leading-tight">IMUTÁVEL FIRE</h1>
+                    <p class="text-xs text-gray-500 font-semibold tracking-wider">REG 05-092</p>
                 </div>
             </div>
             <div>
-                <a href="#matricula" class="bg-fire-red hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full transition duration-300 shadow-lg inline-block">
-                    Inscreva-se Agora
+                <a href="#matricula" class="bg-fire-red hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-full transition duration-300 shadow-md inline-block text-sm">
+                    Garantir Vaga
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="relative bg-fire-dark text-white pt-20 pb-28 flex items-center min-h-[80vh]">
-        <!-- Imagem de Fundo com Overlay -->
-        <div class="absolute inset-0 z-0">
-            <img src="{% static 'img/bombeiro-bg.jpeg.png' %}" alt="Bombeiro Civil em Ação" class="w-full h-full object-cover opacity-40">
-            <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
-        </div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <!-- Hero Section sem imagem de fundo (Gradiente Profissional) -->
+    <section class="relative bg-gradient-to-br from-gray-900 via-fire-dark to-black text-white py-20 md:py-28 overflow-hidden">
+        <!-- Padrão geométrico de fundo -->
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#E53E3E_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-3xl">
-                <span class="inline-block py-1 px-3 rounded-full bg-fire-gold text-fire-dark font-bold text-sm tracking-wider uppercase mb-4">
-                    Vagas Limitadas • Duração: 2 Meses
+                <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-fire-gold/20 border border-fire-gold/40 text-fire-gold font-bold text-sm mb-6">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Vagas Limitadas • Formação em 2 Meses
                 </span>
+                
                 <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
                     A Sua Missão Começa Aqui:<br>
                     <span class="text-fire-red">Torne-se um Bombeiro Civil Profissional</span>
                 </h1>
-                <p class="text-xl md:text-2xl mb-8 text-gray-300">
-                    Prepare-se para salvar vidas com o melhor treinamento prático e teórico. 
-                    <strong class="text-white block mt-2">Bolsa Especial de Lançamento: De <span class="line-through text-gray-400">R$ 1.500</span> por apenas R$ 750!</strong>
+                
+                <p class="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed">
+                    Aprenda a salvar vidas com treinamento prático de alta performance. 
+                    <strong class="text-white block mt-3 text-xl md:text-2xl">
+                        Bolsa Especial de Lançamento: De <span class="line-through text-gray-500">R$ 1.500</span> por apenas <span class="text-fire-gold font-bold">R$ 750</span>
+                    </strong>
                 </p>
+
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="#matricula" class="bg-fire-red hover:bg-red-700 text-white text-center font-bold text-lg py-4 px-8 rounded-full transition duration-300 shadow-lg shadow-red-500/50">
-                        Garantir Minha Vaga com Desconto
+                    <a href="#matricula" class="bg-fire-red hover:bg-red-700 text-white text-center font-bold text-lg py-4 px-8 rounded-full transition duration-300 shadow-lg shadow-red-500/30 flex items-center justify-center space-x-2">
+                        <span>INSCREVER-SE COM DESCONTO</span>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
@@ -78,42 +83,42 @@
     <section class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-fire-dark mb-4">Estrutura Completa para a Sua Formação</h2>
-                <p class="text-lg text-gray-600">Tudo o que você precisa para sair pronto e certificado para o mercado de trabalho.</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-fire-dark mb-4">Estrutura Completa para a Sua Formação</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Tudo o que você precisa para sair 100% pronto e certificado para atuar no mercado de trabalho.</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Item 1 -->
-                <div class="bg-gray-50 border border-gray-100 p-8 rounded-2xl text-center shadow-sm hover:shadow-xl transition duration-300">
-                    <div class="w-16 h-16 mx-auto bg-red-100 text-fire-red rounded-full flex items-center justify-center text-2xl mb-6">
+                <div class="bg-gray-50 border border-gray-100 p-8 rounded-2xl text-center hover:border-fire-red/30 hover:shadow-xl transition duration-300">
+                    <div class="w-16 h-16 mx-auto bg-red-100 text-fire-red rounded-2xl flex items-center justify-center text-3xl mb-6">
                         <i class="fa-solid fa-shirt"></i>
                     </div>
                     <h3 class="text-xl font-bold text-fire-dark mb-2">Camisa Exclusiva</h3>
-                    <p class="text-gray-600">Uniforme oficial do curso para uso durante os treinamentos.</p>
+                    <p class="text-gray-600 text-sm">Uniforme oficial do curso para uso nos treinamentos práticos.</p>
                 </div>
                 <!-- Item 2 -->
-                <div class="bg-gray-50 border border-gray-100 p-8 rounded-2xl text-center shadow-sm hover:shadow-xl transition duration-300">
-                    <div class="w-16 h-16 mx-auto bg-red-100 text-fire-red rounded-full flex items-center justify-center text-2xl mb-6">
-                        <i class="fa-solid fa-file-pdf"></i>
+                <div class="bg-gray-50 border border-gray-100 p-8 rounded-2xl text-center hover:border-fire-red/30 hover:shadow-xl transition duration-300">
+                    <div class="w-16 h-16 mx-auto bg-red-100 text-fire-red rounded-2xl flex items-center justify-center text-3xl mb-6">
+                        <i class="fa-solid fa-book-open"></i>
                     </div>
                     <h3 class="text-xl font-bold text-fire-dark mb-2">Apostila em PDF</h3>
-                    <p class="text-gray-600">Material didático completo e atualizado para estudo teórico.</p>
+                    <p class="text-gray-600 text-sm">Material didático completo e atualizado para acompanhamento das aulas.</p>
                 </div>
                 <!-- Item 3 -->
-                <div class="bg-gray-50 border border-gray-100 p-8 rounded-2xl text-center shadow-sm hover:shadow-xl transition duration-300">
-                    <div class="w-16 h-16 mx-auto bg-red-100 text-fire-red rounded-full flex items-center justify-center text-2xl mb-6">
-                        <i class="fa-solid fa-certificate"></i>
+                <div class="bg-gray-50 border border-gray-100 p-8 rounded-2xl text-center hover:border-fire-red/30 hover:shadow-xl transition duration-300">
+                    <div class="w-16 h-16 mx-auto bg-red-100 text-fire-red rounded-2xl flex items-center justify-center text-3xl mb-6">
+                        <i class="fa-solid fa-award"></i>
                     </div>
                     <h3 class="text-xl font-bold text-fire-dark mb-2">Certificado</h3>
-                    <p class="text-gray-600">Certificação reconhecida de conclusão do curso profissionalizante.</p>
+                    <p class="text-gray-600 text-sm">Certificação profissional reconhecida de conclusão de curso.</p>
                 </div>
                 <!-- Item 4 -->
-                <div class="bg-gray-50 border border-gray-100 p-8 rounded-2xl text-center shadow-sm hover:shadow-xl transition duration-300">
-                    <div class="w-16 h-16 mx-auto bg-red-100 text-fire-red rounded-full flex items-center justify-center text-2xl mb-6">
-                        <i class="fa-solid fa-id-badge"></i>
+                <div class="bg-gray-50 border border-gray-100 p-8 rounded-2xl text-center hover:border-fire-red/30 hover:shadow-xl transition duration-300">
+                    <div class="w-16 h-16 mx-auto bg-red-100 text-fire-red rounded-2xl flex items-center justify-center text-3xl mb-6">
+                        <i class="fa-solid fa-id-card"></i>
                     </div>
                     <h3 class="text-xl font-bold text-fire-dark mb-2">Carteira Profissional</h3>
-                    <p class="text-gray-600">Sua identificação oficial como Bombeiro Civil capacitado.</p>
+                    <p class="text-gray-600 text-sm">Sua identificação oficial como Bombeiro Civil qualificado.</p>
                 </div>
             </div>
         </div>
@@ -122,74 +127,84 @@
     <!-- Cronograma, Local e Checkout -->
     <section class="py-20 bg-gray-100" id="matricula">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
                 <div class="grid grid-cols-1 lg:grid-cols-2">
                     
                     <!-- Informações de Turmas -->
-                    <div class="p-10 md:p-14 bg-fire-dark text-white">
-                        <h2 class="text-3xl font-bold mb-6">Cronograma de Aulas</h2>
-                        
-                        <div class="mb-8 p-4 bg-white/10 rounded-xl border border-white/20">
-                            <h3 class="text-xl font-semibold text-fire-gold mb-2"><i class="fa-solid fa-calendar-check mr-2"></i>Aula Inaugural</h3>
-                            <p class="text-lg">Dia 15 de Agosto de 2026</p>
+                    <div class="p-10 md:p-14 bg-fire-dark text-white flex flex-col justify-between">
+                        <div>
+                            <h2 class="text-3xl font-extrabold mb-6">Cronograma de Aulas</h2>
+                            
+                            <div class="mb-8 p-5 bg-white/10 rounded-2xl border border-white/15">
+                                <h3 class="text-lg font-bold text-fire-gold mb-1 flex items-center gap-2">
+                                    <i class="fa-solid fa-calendar-check"></i> Aula Inaugural
+                                </h3>
+                                <p class="text-xl font-extrabold">Dia 15 de Agosto de 2026</p>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="bg-white/5 p-4 rounded-xl">
+                                    <h4 class="text-md font-bold text-gray-300 mb-1">Turma 1 (Sexta-feira)</h4>
+                                    <p class="flex items-center text-lg font-semibold"><i class="fa-regular fa-clock mr-3 text-fire-red"></i> Das 08h às 17h</p>
+                                </div>
+                                <div class="bg-white/5 p-4 rounded-xl">
+                                    <h4 class="text-md font-bold text-gray-300 mb-1">Turma 2 (Sábado)</h4>
+                                    <p class="flex items-center text-lg font-semibold"><i class="fa-regular fa-clock mr-3 text-fire-red"></i> Das 08h às 13h</p>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="space-y-6">
-                            <div>
-                                <h4 class="text-lg font-bold text-gray-300 mb-1">Turma 1 (Sexta-feira)</h4>
-                                <p class="flex items-center text-lg"><i class="fa-regular fa-clock mr-3 text-fire-red"></i> Das 08h às 17h</p>
-                            </div>
-                            <div>
-                                <h4 class="text-lg font-bold text-gray-300 mb-1">Turma 2 (Sábado)</h4>
-                                <p class="flex items-center text-lg"><i class="fa-regular fa-clock mr-3 text-fire-red"></i> Das 08h às 13h</p>
-                            </div>
-                        </div>
-
-                        <div class="mt-12">
-                            <h3 class="text-2xl font-bold mb-4">Investimento</h3>
-                            <div class="space-y-2 mb-8">
-                                <p class="text-gray-400">Taxa de Inscrição: <span class="text-white font-bold">R$ 60</span></p>
-                                <p class="text-gray-400">Valor do Curso: <span class="line-through">R$ 1.500</span></p>
-                                <p class="text-4xl font-extrabold text-fire-gold">R$ 750</p>
+                        <div class="mt-10 pt-8 border-t border-white/10">
+                            <h3 class="text-xl font-bold mb-3 text-gray-300">Resumo do Investimento:</h3>
+                            <div class="space-y-1">
+                                <p class="text-gray-400 text-sm">Taxa de Inscrição: <span class="text-white font-bold">R$ 60</span></p>
+                                <p class="text-gray-400 text-sm">De: <span class="line-through">R$ 1.500</span></p>
+                                <p class="text-4xl font-extrabold text-fire-gold">R$ 750 <span class="text-sm font-normal text-gray-300">à vista</span></p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Checkout e Local de Matrícula -->
-                    <div class="p-10 md:p-14 flex flex-col justify-center">
-                        <div class="flex items-center space-x-6 mb-8">
-                            <img src="{% static 'img/logo.jpeg.jpeg' %}" alt="Logo Imutável Fire" class="h-20 object-contain">
-                            <img src="{% static 'img/ong.jpg' %}" alt="Logo ONG Parceira" class="h-16 object-contain">
-                        </div>
-
-                        <h2 class="text-3xl font-bold text-fire-dark mb-4">Garantir Inscrição Online</h2>
-                        <p class="text-gray-600 mb-6">Preencha seu e-mail para ser redirecionado ao pagamento seguro do Mercado Pago:</p>
-
-                        <!-- Form de Checkout conectado ao Mercado Pago -->
-                        <form action="{% url 'management:criar_pagamento' %}" method="POST" class="space-y-4 mb-8">
-                            {% csrf_token %}
-                            <input type="hidden" name="curso_nome" value="Curso Profissional Bombeiro Civil - Imutável Fire">
-                            <input type="hidden" name="preco" value="750.00">
-                            
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Seu E-mail principal:</label>
-                                <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-fire-red focus:border-transparent outline-none">
+                    <div class="p-10 md:p-14 flex flex-col justify-between">
+                        <div>
+                            <!-- Selos da Instituição e Parceria (Com Ícones) -->
+                            <div class="flex items-center gap-4 mb-8">
+                                <div class="px-4 py-2 bg-red-50 text-fire-red rounded-lg font-black text-sm border border-red-200 flex items-center gap-2">
+                                    <i class="fa-solid fa-shield-halved"></i> IMUTÁVEL FIRE
+                                </div>
+                                <div class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-bold text-sm border border-blue-200 flex items-center gap-2">
+                                    <i class="fa-solid fa-handshake-angle"></i> Instituto Via Solidária
+                                </div>
                             </div>
 
-                            <button type="submit" class="w-full bg-fire-red hover:bg-red-700 text-white font-bold text-xl py-4 px-8 rounded-full transition duration-300 shadow-lg flex items-center justify-center space-x-2">
-                                <i class="fa-solid fa-lock"></i>
-                                <span>PAGAR MATRÍCULA VIA PIX / CARTÃO</span>
-                            </button>
-                        </form>
+                            <h2 class="text-3xl font-extrabold text-fire-dark mb-2">Garantir Inscrição Online</h2>
+                            <p class="text-gray-600 mb-6">Insira seu e-mail para abrir o checkout seguro no Mercado Pago:</p>
 
-                        <div class="border-t border-gray-200 pt-6 space-y-3 text-sm text-gray-700">
-                            <p><strong>Parceria Estratégica:</strong> Instituto Via Solidária</p>
-                            <p class="flex items-start">
-                                <i class="fa-solid fa-location-dot mt-1 mr-2 text-fire-red"></i>
+                            <!-- Form de Checkout -->
+                            <form action="{% url 'management:criar_pagamento' %}" method="POST" class="space-y-4 mb-8">
+                                {% csrf_token %}
+                                <input type="hidden" name="curso_nome" value="Curso Profissional Bombeiro Civil - Imutável Fire">
+                                <input type="hidden" name="preco" value="750.00">
+                                
+                                <div>
+                                    <label for="email" class="block text-sm font-bold text-gray-700 mb-1">Seu E-mail principal:</label>
+                                    <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com" class="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-fire-red focus:border-transparent outline-none transition">
+                                </div>
+
+                                <button type="submit" class="w-full bg-fire-red hover:bg-red-700 text-white font-bold text-lg py-4 px-6 rounded-xl transition duration-300 shadow-lg flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <span>PAGAR MATRÍCULA VIA PIX / CARTÃO</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="border-t border-gray-200 pt-6 space-y-3 text-sm text-gray-600">
+                            <p class="flex items-start gap-2">
+                                <i class="fa-solid fa-location-dot mt-1 text-fire-red"></i>
                                 <span>
                                     <strong>Inscrição Presencial:</strong><br>
                                     INSTITUTO VIA SOLIDÁRIA (antigo credec)<br>
-                                    Estrada do Campinho, n.4700 (2ª a 6ª, 08h às 16h)
+                                    Estrada do Campinho, n.4700 (2ª a 6ª feira, das 08h às 16h)
                                 </span>
                             </p>
                         </div>
@@ -202,10 +217,12 @@
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-            <img src="{% static 'img/logo.jpeg.jpeg' %}" alt="Imutável Fire" class="h-12 mb-4 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition duration-300">
-            <p class="mb-2"><strong>IMUTÁVEL FIRE</strong> &copy; 2026 - Todos os direitos reservados.</p>
-            <p class="text-sm">Registro: REG 05-092 | Parceria: Instituto Via Solidária</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center space-y-2">
+            <div class="text-white text-2xl font-black flex items-center gap-2">
+                <i class="fa-solid fa-fire-flame-curved text-fire-red"></i> IMUTÁVEL FIRE
+            </div>
+            <p class="text-sm"><strong>IMUTÁVEL FIRE</strong> &copy; 2026 - Todos os direitos reservados.</p>
+            <p class="text-xs text-gray-500">Registro: REG 05-092 | Parceria Estratégica: Instituto Via Solidária</p>
         </div>
     </footer>
 
