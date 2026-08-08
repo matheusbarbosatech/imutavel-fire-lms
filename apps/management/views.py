@@ -7,19 +7,17 @@ from django.contrib.auth.decorators import login_required
 from apps.accounts.models import CustomUser
 from apps.courses.models import Course, Enrollment
 
-# Inicializa o SDK do Mercado Pago com a chave de API (Lendo do settings ou variável de ambiente)
+# Inicializa o SDK do Mercado Pago lendo do settings (Variável de ambiente do Render)
 MP_TOKEN = getattr(settings, 'MP_ACCESS_TOKEN', 'APP_USR-seu-token-aqui')
 sdk = mercadopago.SDK(MP_TOKEN)
 
 def landing_page_view(request):
     """Cenário A: A Landing Page oficial na raiz do site (/)"""
-    # Se o usuário já estiver logado, podemos redirecionar direto para o painel dele
     if request.user.is_authenticated:
         if request.user.role == 'ADMIN':
             return redirect('management:dashboard')
         return redirect('courses:student_dashboard')
         
-    # Busca alguns cursos para exibir na vitrine da Landing Page
     cursos_disponiveis = Course.objects.all()[:3]
     
     context = {
@@ -46,6 +44,53 @@ def dashboard_view(request):
     return render(request, 'management/dashboard.html', context)
 
 
+@login_required
+def enrollment_list_view(request):
+    """Lista de matrículas para gestão"""
+    if request.user.role != 'ADMIN' and not request.user.is_superuser:
+        return redirect('courses:student_dashboard')
+    
+    matriculas = Enrollment.objects.all().select_related('student', 'course')
+    context = {'matriculas': matriculas}
+    return render(request, 'management/enrollment_list.html', context)
+
+
+@login_required
+def enrollment_action_view(request, enrollment_id, action):
+    """Ações de aprovar ou bloquear matrículas"""
+    if request.user.role != 'ADMIN' and not request.user.is_superuser:
+        return redirect('courses:student_dashboard')
+        
+    try:
+        enrollment = Enrollment.objects.get(id=enrollment_id)
+        if action == 'aprovar':
+            enrollment.is_active = True
+            enrollment.save()
+        elif action == 'bloquear':
+            enrollment.is_active = False
+            enrollment.save()
+    except Enrollment.DoesNotExist:
+        pass
+        
+    return redirect('management:enrollment_list')
+
+
+@login_required
+def financial_list_view(request):
+    """Painel financeiro do gestor"""
+    if request.user.role != 'ADMIN' and not request.user.is_superuser:
+        return redirect('courses:student_dashboard')
+    return render(request, 'management/financial_list.html')
+
+
+@login_required
+def register_payment_view(request, payment_id):
+    """Baixa de pagamentos manuais"""
+    if request.user.role != 'ADMIN' and not request.user.is_superuser:
+        return redirect('courses:student_dashboard')
+    return redirect('management:financial_list')
+
+
 def criar_pagamento_mercadopago(request):
     """Gera a preferência de pagamento no Mercado Pago e redireciona o aluno"""
     if request.method == 'POST':
@@ -53,7 +98,6 @@ def criar_pagamento_mercadopago(request):
         preco = float(request.POST.get('preco', 97.00))
         email_aluno = request.POST.get('email', 'aluno@email.com')
 
-        # Dados estruturados para o Checkout do Mercado Pago
         preference_data = {
             "items": [
                 {
@@ -79,7 +123,6 @@ def criar_pagamento_mercadopago(request):
             preference = preference_response.get("response")
             
             if preference and "init_point" in preference:
-                # Redireciona para o link oficial de pagamento do Mercado Pago
                 return redirect(preference["init_point"])
         except Exception as e:
             print(f"Erro ao gerar pagamento MP: {e}")
@@ -96,14 +139,12 @@ def mercadopago_webhook(request):
 
         if topic == 'payment' and payment_id:
             try:
-                # Consulta os detalhes do pagamento diretamente na API do Mercado Pago
                 payment_info = sdk.payment().get(payment_id)
                 payment = payment_info.get("response")
                 
                 if payment and payment.get("status") == "approved":
                     email_comprador = payment.get("payer", {}).get("email")
                     
-                    # 1. Verifica se o usuário já existe, se não, cria uma conta provisória
                     user, created = CustomUser.objects.get_or_create(
                         email=email_comprador,
                         defaults={
@@ -113,10 +154,9 @@ def mercadopago_webhook(request):
                         }
                     )
                     if created:
-                        user.set_password('MudeSuaSenha123') # Senha temporária enviada por email depois
+                        user.set_password('MudeSuaSenha123')
                         user.save()
                     
-                    # 2. Matricula o usuário em todos os cursos ativos (ou no curso comprado)
                     cursos = Course.objects.all()
                     for curso in cursos:
                         Enrollment.objects.get_or_create(student=user, course=curso)
