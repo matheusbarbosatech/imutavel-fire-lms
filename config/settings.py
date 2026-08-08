@@ -18,7 +18,7 @@ DEBUG = 'RENDER' not in os.environ
 # Permite que o Render acesse a aplicação
 ALLOWED_HOSTS = ['*']
 
-# 🟢 ADICIONE ESTAS LINHAS: Diz ao Django para confiar no protocolo HTTPS do Render
+# Diz ao Django para confiar no protocolo HTTPS do Render
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
     'https://sistema-matricula-fmp9.onrender.com',
@@ -115,15 +115,12 @@ USE_TZ = True
 
 # 9. ARQUIVOS ESTÁTICOS E MÍDIA (CSS, JS, Imagens, PDFs)
 STATIC_URL = '/static/'
-# Onde ficam seus estáticos de desenvolvimento (css, img, js)
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-# Onde o Django vai juntar todos os estáticos na hora do Deploy
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Ativa a compressão e otimização do WhiteNoise para produção
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# WhiteNoise sem validação rígida de arquivo estático faltante para evitar erros 404 em PWA/SW
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-# Mídias dinâmicas enviadas pelo usuário (Fotos, Documentos e PDFs gerados)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -138,3 +135,6 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'courses:student_dashboard'
 LOGOUT_REDIRECT_URL = 'accounts:login'
+
+# 💳 INTEGRAÇÃO MERCADO PAGO (Carrega do ambiente do Render)
+MP_ACCESS_TOKEN = os.environ.get('MP_ACCESS_TOKEN', '')
