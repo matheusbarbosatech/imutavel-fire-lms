@@ -12,4 +12,6 @@ urlpatterns = [
     # Perfil, Documentos de Matrícula e Declarações Institucionais
     path('perfil/', views.profile_view, name='profile'),
     path('declaracao/<str:doc_type_code>/', views.download_declaration, name='download_declaration'),
+
+    path('cadastro/', views.register_view, name='register'),
 ]

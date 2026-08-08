@@ -17,6 +17,7 @@ urlpatterns = [
     path('quizzes/', include('apps.quizzes.urls')),
     path('certificates/', include('apps.certificates.urls')),
     path('gestao/', include('apps.management.urls')),
+    path('auth/', include('django.contrib.auth.urls')),
 ]
 
 if settings.DEBUG:

@@ -78,3 +78,49 @@ def download_declaration(request, doc_type_code):
         return FileResponse(open(full_path, 'rb'), content_type='application/pdf', filename=output_filename)
     else:
         raise Http404("Documento institucional não localizado.")
+
+    from django.contrib.auth import login
+from .models import CustomUser
+
+def register_view(request):
+    # Se o usuário já estiver logado, manda ele pro painel
+    if request.user.is_authenticated:
+        return redirect('courses:student_dashboard')
+        
+    if request.method == 'POST':
+        nome = request.POST.get('first_name')
+        email = request.POST.get('email')
+        cpf = request.POST.get('cpf')
+        senha = request.POST.get('password')
+        
+        # 1. Verifica se o email já existe
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, 'Este e-mail já está em uso. Tente recuperar a senha.')
+            return redirect('accounts:register')
+            
+        try:
+            # 2. Cria o novo usuário
+            user = CustomUser(
+                email=email,
+                first_name=nome,
+                cpf=cpf,
+                role='STUDENT' # Define automaticamente como ALUNO
+            )
+            
+            # Se o seu CustomUser usar o padrão do Django, ele precisa do 'username'
+            if hasattr(user, 'username'):
+                user.username = email 
+                
+            user.set_password(senha) # Criptografa a senha com segurança
+            user.save()
+            
+            # 3. Faz o login automático e manda pro painel
+            login(request, user)
+            messages.success(request, 'Cadastro realizado com sucesso! Bem-vindo(a) ao Imutável Fire.')
+            return redirect('courses:student_dashboard')
+            
+        except Exception as e:
+            messages.error(request, f'Erro ao criar conta. Verifique os dados e tente novamente.')
+            return redirect('accounts:register')
+            
+    return render(request, 'accounts/register.html')

@@ -2,31 +2,45 @@
 {% block title %}Criar Conta - IMUTÁVEL FIRE{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-4">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0">
-            <div class="card-body p-4">
-                <h3 class="fw-bold text-danger text-center mb-1">🔥 IMUTÁVEL FIRE</h3>
-                <p class="text-muted text-center small mb-4">Cadastro de Novo Aluno</p>
-
-                <form method="post">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-danger btn-lg fs-6 fw-bold">CRIAR MINHA CONTA</button>
-                    </div>
-                </form>
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-5">
+        <div class="card shadow border-0 rounded-4 p-4">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-danger"><i class="bi bi-fire"></i> IMUTÁVEL FIRE</h3>
+                <p class="text-muted">Crie sua conta e acesse seus treinamentos</p>
             </div>
-            <div class="card-footer text-center py-3">
-                <small>Já tem conta? <a href="{% url 'accounts:login' %}">Faça Login</a></small>
+
+            <form method="post" action="{% url 'accounts:register' %}">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Nome Completo</label>
+                    <input type="text" name="first_name" class="form-control form-control-lg" required placeholder="João da Silva">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">CPF</label>
+                    <input type="text" name="cpf" class="form-control form-control-lg" required placeholder="000.000.000-00">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">E-mail (Será seu login)</label>
+                    <input type="email" name="email" class="form-control form-control-lg" required placeholder="joao@email.com">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Senha</label>
+                    <input type="password" name="password" class="form-control form-control-lg" required placeholder="Crie uma senha forte">
+                </div>
+
+                <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold shadow-sm">
+                    <i class="bi bi-person-plus-fill me-2"></i> Criar Minha Conta
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <span class="text-muted">Já tem uma conta?</span>
+                <a href="{% url 'accounts:login' %}" class="text-danger fw-bold text-decoration-none">Faça Login aqui</a>
             </div>
         </div>
     </div>
