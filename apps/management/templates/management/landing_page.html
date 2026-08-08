@@ -38,17 +38,25 @@
                     <p class="text-xs text-gray-500 font-semibold tracking-wider">REG 05-092</p>
                 </div>
             </div>
-            <div>
-                <a href="#matricula" class="bg-fire-red hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-full transition duration-300 shadow-md inline-block text-sm">
+            
+            <!-- Botões de Ação no Header -->
+            <div class="flex items-center space-x-3">
+                <!-- Botão de Login para quem já é aluno -->
+                <a href="{% url 'accounts:login' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2.5 px-4 md:px-5 rounded-full transition duration-300 border border-gray-300 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket text-fire-red"></i>
+                    <span>Já sou Aluno</span>
+                </a>
+
+                <!-- Botão de Inscrição -->
+                <a href="#matricula" class="bg-fire-red hover:bg-red-700 text-white font-bold py-2.5 px-5 md:px-6 rounded-full transition duration-300 shadow-md text-sm hidden sm:inline-block">
                     Garantir Vaga
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section sem imagem de fundo (Gradiente Profissional) -->
+    <!-- Hero Section -->
     <section class="relative bg-gradient-to-br from-gray-900 via-fire-dark to-black text-white py-20 md:py-28 overflow-hidden">
-        <!-- Padrão geométrico de fundo -->
         <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#E53E3E_1px,transparent_1px)] [background-size:16px_16px]"></div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -167,7 +175,6 @@
                     <!-- Checkout e Local de Matrícula -->
                     <div class="p-10 md:p-14 flex flex-col justify-between">
                         <div>
-                            <!-- Selos da Instituição e Parceria (Com Ícones) -->
                             <div class="flex items-center gap-4 mb-8">
                                 <div class="px-4 py-2 bg-red-50 text-fire-red rounded-lg font-black text-sm border border-red-200 flex items-center gap-2">
                                     <i class="fa-solid fa-shield-halved"></i> IMUTÁVEL FIRE
