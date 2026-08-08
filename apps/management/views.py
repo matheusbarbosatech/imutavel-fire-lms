@@ -152,7 +152,7 @@ def criar_pagamento_mercadopago(request):
 
 @csrf_exempt
 def mercadopago_webhook(request):
-    """Recebe a notificação silenciosa do Mercado Pago quando o pagamento é aprovado"""
+    """Processa a aprovação do pagamento e libera a matrícula automaticamente."""
     if request.method == 'POST':
         topic = request.GET.get('topic') or request.POST.get('type') or request.GET.get('type')
         payment_id = request.GET.get('id') or request.POST.get('data.id') or request.GET.get('data.id')
@@ -173,7 +173,7 @@ def mercadopago_webhook(request):
                         user, created = CustomUser.objects.get_or_create(
                             email=email_comprador,
                             defaults={
-                                'first_name': 'Aluno SaaS',
+                                'first_name': email_comprador.split('@')[0],
                                 'role': 'STUDENT',
                                 'username': email_comprador
                             }
@@ -182,13 +182,13 @@ def mercadopago_webhook(request):
                             user.set_password('MudeSuaSenha123')
                             user.save()
 
+                        # Libera o acesso a todos os cursos para o comprador
                         cursos = Course.objects.all()
                         for curso in cursos:
-                            Enrollment.objects.get_or_create(student=user, course=curso)
+                            Enrollment.objects.get_or_create(student=user, course=curso, defaults={'is_active': True})
+                        print(f"🎉 Matrícula liberada automaticamente para: {email_comprador}")
 
             except Exception as e:
-                print(f"Erro no processamento do webhook: {e}")
-
-        return HttpResponse(status=200)
+                print(f"❌ Erro no processamento do webhook: {e}")
 
     return HttpResponse(status=200)
