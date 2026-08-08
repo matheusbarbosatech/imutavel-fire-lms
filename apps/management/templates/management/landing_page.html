@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imutável Fire - Domine a Tecnologia e Transforme sua Carreira</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-dark text-white">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-danger" href="#"><i class="fa-solid fa-fire"></i> IMUTÁVEL FIRE</a>
+            <div class="ms-auto">
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm me-2">Entrar</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-danger btn-sm">Criar Conta</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="py-5 text-center container">
+        <div class="row py-lg-5">
+            <div class="col-lg-8 mx-auto">
+                <span class="badge bg-danger mb-3 px-3 py-2 text-uppercase tracking-wide">Plataforma Oficial de Ensino</span>
+                <h1 class="fw-bold display-4 mb-3">Domine Programação, Dados e Cibersegurança</h1>
+                <p class="lead text-muted mb-4">Aprenda na prática com metodologias avançadas e conquiste seu espaço no mercado tecnológico. Conteúdo direto ao ponto para alavancar sua carreira.</p>
+                
+                <!-- Formulário de Compra Integrado ao Mercado Pago -->
+                <form action="{% url 'management:criar_pagamento' %}" method="POST" class="card bg-secondary text-white p-4 shadow-lg border-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="curso_nome" value="Imutável Fire - Acesso Total Vitalício">
+                    <input type="hidden" name="preco" value="97.00">
+                    
+                    <h3 class="h4 mb-3 text-warning">Garantir Acesso Completo por Apenas R$ 97,00</h3>
+                    
+                    <div class="mb-3 text-start">
+                        <label for="email" class="form-label">Seu melhor e-mail para receber o acesso:</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="seu-email@gmail.com" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg fw-bold w-100 py-3 shadow">
+                        <i class="fa-solid fa-lock me-2"></i> COMPRAR AGORA VIA PIX / CARTÃO
+                    </button>
+                    <small class="text-white-50 mt-2">Pagamento 100% seguro processado pelo Mercado Pago.</small>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Benefícios -->
+    <section class="py-5 bg-black">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <div class="p-4 bg-dark rounded border border-secondary h-100">
+                        <i class="fa-solid fa-laptop-code fa-3x text-danger mb-3"></i>
+                        <h4>Projetos Práticos</h4>
+                        <p class="text-muted">Desenvolva aplicações reais do mercado desde o primeiro módulo.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="p-4 bg-dark rounded border border-secondary h-100">
+                        <i class="fa-solid fa-certificate fa-3x text-danger mb-3"></i>
+                        <h4>Certificado Incluso</h4>
+                        <p class="text-muted">Receba certificação válida ao concluir 100% dos treinamentos e simulados.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="p-4 bg-dark rounded border border-secondary h-100">
+                        <i class="fa-solid fa-bolt fa-3x text-danger mb-3"></i>
+                        <h4>Acesso Imediato</h4>
+                        <p class="text-muted">Comprou, aprovou no Pix, o sistema libera todo o conteúdo na hora para você.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 bg-black border-top border-secondary text-muted">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 Imutável Fire LMS. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
