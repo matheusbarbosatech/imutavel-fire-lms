@@ -1,16 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect
 from django.conf import settings
 from django.conf.urls.static import static
 
-def root_redirect(request):
-    if request.user.is_authenticated:
-        return redirect('courses:student_dashboard')
-    return redirect('accounts:login')
-
 urlpatterns = [
-    path('', root_redirect, name='root'),
+    # 🌟 A ROTA RAIZ ('') AGORA APONTA PARA A LANDING PAGE DO MANAGEMENT
+    path('', include('apps.management.urls')),
+    
+    # Módulos do Sistema
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls')),
     path('courses/', include('apps.courses.urls')),
