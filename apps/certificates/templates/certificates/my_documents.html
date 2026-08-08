@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Documentos - IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-file-earmark-check text-danger me-2"></i>Meus Documentos & Credenciais</h2>
+        <p class="text-muted small mb-0">Consulte e baixe seus certificados e carteirinhas profissionais em PVC.</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for cert in certificates %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                    <span class="badge bg-danger">REGISTRO ATIVO</span>
+                    <small class="text-white-50">Cód: {{ cert.auth_code }}</small>
+                </div>
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-primary mb-2">{{ cert.course.title }}</h5>
+                    <p class="small text-muted mb-3">Carga Horária: {{ cert.course.workload_hours }}h</p>
+
+                    <div class="p-3 bg-light rounded border mb-3">
+                        <div class="row text-center">
+                            <div class="col-6 border-end">
+                                <small class="text-muted d-block">Data de Emissão</small>
+                                <strong class="small">{{ cert.issued_at|date:"d/m/Y" }}</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Validade / Reciclagem</small>
+                                <strong class="small text-danger">{{ cert.expires_at|date:"d/m/Y"|default:"Indeterminada" }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'certificates:emit_certificate' cert.course.slug %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye-fill me-1"></i> Visualizar Documento
+                        </a>
+                        {% if cert.pdf_file_path %}
+                            <a href="{% url 'certificates:download_certificate_pdf' cert.auth_code %}" class="btn btn-danger btn-sm fw-bold">
+                                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Certificado PDF
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'certificates:download_pvc_card' cert.auth_code %}" class="btn btn-dark btn-sm fw-bold">
+                            <i class="bi bi-credit-card-2-front-fill me-1 text-danger"></i> Baixar Carteirinha PVC (PNG)
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center py-2">
+                    <small class="text-muted">
+                        Validação Pública: <a href="{% url 'certificates:validate_certificate_public' cert.auth_code %}" target="_blank" class="text-decoration-none">Verificar QR Code <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="card p-5 text-center shadow-sm border-0">
+                <i class="bi bi-award text-muted fs-1 mb-3"></i>
+                <h5 class="fw-bold">Nenhum certificado ou credencial emitido</h5>
+                <p class="text-muted">Conclua 100% das aulas e seja aprovado no simulado para liberar seus documentos.</p>
+                <div class="mt-2">
+                    <a href="{% url 'courses:student_dashboard' %}" class="btn btn-danger"><i class="bi bi-journal-bookmark me-1"></i> Ir para Meus Cursos</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Documentos - IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Meus Certificados e Carteirinhas</h2>
+
+<div class="row">
+    {% for cert in certificates %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ cert.course.title }}</h5>
+                    <p class="card-text text-muted small">Emitido em: {{ cert.issued_at|date:"d/m/Y" }}</p>
+                    <p class="card-text"><span class="badge bg-secondary">Hash: {{ cert.auth_code }}</span></p>
+                    
+                    <a href="{% url 'certificates:request_certificate' cert.course.slug %}" class="btn btn-primary btn-sm">Visualizar e Baixar Documento</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">Você ainda não possui certificados emitidos. Conclua seus cursos e simulados para liberar seus documentos!</div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

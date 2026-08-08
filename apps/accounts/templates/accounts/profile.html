@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil Profissional - IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- COLUNA ESQUERDA: Avatar, Badges e Declarações -->
+    <div class="col-md-4 mb-4">
+        <!-- Card de Avatar -->
+        <div class="card shadow-sm border-0 text-center p-4 mb-4">
+            <div class="mb-3 position-relative">
+                {% if user.photo %}
+                    <img src="{{ user.photo.url }}" alt="Foto 3x4" class="rounded border border-danger shadow-sm" style="width: 150px; height: 180px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary text-white rounded d-inline-flex align-items-center justify-content-center border border-danger shadow-sm" style="width: 150px; height: 180px;">
+                        <i class="bi bi-person-fill fs-1"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <h5 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h5>
+            <span class="badge bg-danger mb-2">{{ user.get_role_display }}</span>
+            <p class="small text-muted mb-0">Registro CBMERJ: {{ user.cbmerj_registration|default:"N/A" }}</p>
+        </div>
+
+        <!-- Card de Declarações Institucionais (PDF) -->
+        <div class="card shadow-sm border-0 mb-4 p-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>Declarações Oficiais</h6>
+            <div class="d-grid gap-2">
+                <a href="{% url 'accounts:download_declaration' 'MATRICULA' %}" class="btn btn-outline-dark btn-sm text-start" target="_blank">
+                    <i class="bi bi-download me-2 text-danger"></i> Matrícula Ativa
+                </a>
+                <a href="{% url 'accounts:download_declaration' 'FREQUENCIA' %}" class="btn btn-outline-dark btn-sm text-start" target="_blank">
+                    <i class="bi bi-download me-2 text-danger"></i> Frequência Escolar
+                </a>
+                <a href="{% url 'accounts:download_declaration' 'HISTORICO' %}" class="btn btn-outline-dark btn-sm text-start" target="_blank">
+                    <i class="bi bi-download me-2 text-danger"></i> Histórico Técnico
+                </a>
+                <a href="{% url 'accounts:download_declaration' 'HOMOLOGACAO' %}" class="btn btn-outline-dark btn-sm text-start" target="_blank">
+                    <i class="bi bi-download me-2 text-danger"></i> Aguardando Homologação
+                </a>
+            </div>
+        </div>
+
+        <!-- Card de Gamificação (Medalhas) -->
+        <div class="card shadow-sm border-0 p-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-award-fill text-warning me-1"></i>Minhas Conquistas</h6>
+            <div class="d-flex flex-wrap gap-2">
+                {% for ub in user_badges %}
+                    <div class="p-2 bg-light rounded border text-center" style="width: 80px;" title="{{ ub.badge.description }}">
+                        <i class="bi {{ ub.badge.icon_class }} fs-2 text-danger"></i>
+                        <small class="d-block text-truncate fw-semibold mt-1" style="font-size: 10px;">{{ ub.badge.name }}</small>
+                    </div>
+                {% empty %}
+                    <small class="text-muted">Conclua cursos para desbloquear medalhas virtuais.</small>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- COLUNA DIREITA: Formulários de Dados e Upload de Documentos -->
+    <div class="col-md-8">
+        
+        <!-- Formulário de Dados Cadastrais -->
+        <div class="card shadow-sm border-0 p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill me-2 text-danger"></i>Dados da Credencial</h5>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold small">Nome</label>
+                        <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold small">Sobrenome</label>
+                        <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold small">CPF</label>
+                        <input type="text" name="cpf" class="form-control" value="{{ user.cpf|default:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold small">RG</label>
+                        <input type="text" name="rg" class="form-control" value="{{ user.rg|default:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold small">Reg. Profissional CBMERJ</label>
+                        <input type="text" name="cbmerj_registration" class="form-control" value="{{ user.cbmerj_registration|default:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold small">Tipo Sanguíneo</label>
+                        <input type="text" name="blood_type" class="form-control" placeholder="Ex: O+, A-" value="{{ user.blood_type|default:'' }}">
+                    </div>
+                    <div class="col-12 mb-4">
+                        <label class="form-label fw-bold small">Foto 3x4 (Para a Carteirinha PVC)</label>
+                        <input type="file" name="photo" class="form-control" accept="image/*">
+                    </div>
+                </div>
+                <button type="submit" name="update_profile" class="btn btn-danger fw-bold"><i class="bi bi-save me-1"></i> Salvar Informações</button>
+            </form>
+        </div>
+
+        <!-- Formulário e Lista de Documentos de Matrícula -->
+        <div class="card shadow-sm border-0 p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-folder-check me-2 text-danger"></i>Documentos de Matrícula</h5>
+            
+            <form method="post" enctype="multipart/form-data" class="bg-light p-3 rounded border mb-4">
+                {% csrf_token %}
+                <div class="row align-items-end">
+                    <div class="col-md-5 mb-3 mb-md-0">
+                        <label class="form-label fw-bold small">Tipo de Documento</label>
+                        <select name="doc_type" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="RG">Documento de Identidade (RG/CNH)</option>
+                            <option value="CPF">CPF</option>
+                            <option value="RESIDENCE">Comprovante de Residência</option>
+                            <option value="ASO">ASO / Atestado Médico</option>
+                            <option value="DIPLOMA">Comprovante de Escolaridade</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5 mb-3 mb-md-0">
+                        <label class="form-label fw-bold small">Arquivo (PDF, JPG, PNG)</label>
+                        <input type="file" name="doc_file" class="form-control" required>
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" name="upload_document" class="btn btn-dark fw-bold"><i class="bi bi-upload"></i></button>
+                    </div>
+                </div>
+            </form>
+
+            <h6 class="fw-bold small text-muted text-uppercase mb-3">Meus Anexos</h6>
+            <div class="list-group">
+                {% for doc in documents %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark-text text-secondary me-2"></i>
+                            <span class="fw-semibold small">{{ doc.get_doc_type_display }}</span>
+                            <br>
+                            <small class="text-muted" style="font-size: 11px;">Enviado em: {{ doc.uploaded_at|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <div>
+                            {% if doc.is_verified %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Verificado</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Em Análise</span>
+                            {% endif %}
+                            <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary ms-2" title="Visualizar"><i class="bi bi-eye"></i></a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted small mb-0">Nenhum documento anexado ainda.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

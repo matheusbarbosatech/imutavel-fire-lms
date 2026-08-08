@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Validação de Autenticidade - IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<div class="card max-width-700 mx-auto border-top border-4 border-danger">
+    <div class="card-body p-4 text-center">
+        <h3 class="mb-3">🔥 Sistema de Validação de Documentos</h3>
+        <p class="text-muted mb-4">Consulta pública de verificação de autenticidade de certificados e credenciamentos.</p>
+
+        {% if certificate %}
+            <div class="alert alert-success p-4 rounded-3 text-start">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-patch-check-fill text-success display-4 me-3"></i>
+                    <div>
+                        <h4 class="alert-heading mb-0 text-success fw-bold">DOCUMENTO VÁLIDO E AUTÊNTICO</h4>
+                        <small class="text-muted">Registro verificado no banco de dados central.</small>
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-1"><strong>Aluno(a):</strong> {{ certificate.student.get_full_name|default:certificate.student.username }}</p>
+                <p class="mb-1"><strong>CPF:</strong> {{ certificate.student.cpf }}</p>
+                {% if certificate.student.cbmerj_registration %}
+                    <p class="mb-1"><strong>Registro CBMERJ:</strong> {{ certificate.student.cbmerj_registration }}</p>
+                {% endif %}
+                <p class="mb-1"><strong>Treinamento:</strong> {{ certificate.course.title }}</p>
+                <p class="mb-1"><strong>Carga Horária:</strong> {{ certificate.course.workload_hours }} Horas</p>
+                <p class="mb-0"><strong>Data de Emissão:</strong> {{ certificate.issued_at|date:"d/m/Y H:i" }}</p>
+            </div>
+        {% else %}
+            <div class="alert alert-danger p-4 text-start">
+                <h5 class="alert-heading fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> Documento Não Encontrado ou Inválido</h5>
+                <p class="mb-0">O código de autenticidade <strong>"{{ searched_code }}"</strong> não consta como válido nos registros do sistema.</p>
+            </div>
+        {% endif %}
+
+        <form action="" method="get" class="mt-4">
+            <div class="input-group">
+                <input type="text" name="code" class="form-control" placeholder="Digite o código de autenticidade..." value="{{ searched_code }}">
+                <button class="btn btn-primary" type="submit">Consultar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

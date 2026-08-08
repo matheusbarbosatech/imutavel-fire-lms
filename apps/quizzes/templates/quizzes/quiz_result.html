@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Resultado do Simulado - {{ quiz.course.title }}{% endblock %}
+
+{% block content %}
+<div class="max-width-800 mx-auto">
+    <!-- Cabeçalho de Resultado -->
+    <div class="card shadow-sm border-0 text-center p-5 mb-4">
+        {% if passed %}
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <h2 class="fw-bold mt-3 text-success">Aprovado!</h2>
+            <p class="lead mb-2">Você atingiu <strong>{{ score|floatformat:1 }}%</strong> de aproveitamento.</p>
+            <p class="text-muted small">Parabéns! Seu certificado em PDF foi gerado e enviado para o seu e-mail.</p>
+            <div class="mt-4">
+                <a href="{% url 'certificates:my_documents' %}" class="btn btn-danger fw-bold px-4 py-2">
+                    <i class="bi bi-award-fill me-2"></i> Ver Meus Documentos
+                </a>
+            </div>
+        {% else %}
+            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+            <h2 class="fw-bold mt-3 text-danger">Reprovado</h2>
+            <p class="lead mb-2">Você atingiu <strong>{{ score|floatformat:1 }}%</strong> de aproveitamento.</p>
+            <p class="text-muted small">A nota mínima exigida para este treinamento é de {{ quiz.passing_score }}%. Estude o gabarito abaixo e tente novamente.</p>
+            <div class="mt-4">
+                <a href="{% url 'quizzes:take_quiz' quiz.id %}" class="btn btn-outline-danger fw-bold px-4 py-2">
+                    <i class="bi bi-arrow-repeat me-2"></i> Refazer Simulado
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Gabarito Detalhado -->
+    <h4 class="fw-bold mb-3"><i class="bi bi-list-check text-danger me-2"></i>Gabarito e Correção Técnica</h4>
+    
+    <div class="d-flex flex-column gap-3">
+        {% for item in detailed_feedback %}
+            <div class="card shadow-sm border-0 {% if item.is_correct %}border-start border-success border-4{% else %}border-start border-danger border-4{% endif %}">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">{{ forloop.counter }}. {{ item.question.text }}</h6>
+                    
+                    <div class="mb-2">
+                        <span class="small fw-bold text-muted">Sua resposta:</span><br>
+                        {% if item.selected_option %}
+                            <span class="{% if item.is_correct %}text-success fw-semibold{% else %}text-danger fw-semibold{% endif %}">
+                                <i class="bi {% if item.is_correct %}bi-check-circle{% else %}bi-x-circle{% endif %} me-1"></i> 
+                                {{ item.selected_option.text }}
+                            </span>
+                        {% else %}
+                            <span class="text-warning fw-semibold"><i class="bi bi-dash-circle me-1"></i> Não respondida</span>
+                        {% endif %}
+                    </div>
+
+                    {% if not item.is_correct %}
+                        <div class="mb-3 p-2 bg-light border rounded">
+                            <span class="small fw-bold text-muted">Resposta Correta:</span><br>
+                            <span class="text-success fw-semibold">
+                                <i class="bi bi-check-circle-fill me-1"></i> {{ item.correct_option.text }}
+                            </span>
+                        </div>
+                    {% endif %}
+
+                    <!-- Justificativa Técnica -->
+                    {% if item.question.explanation %}
+                        <div class="mt-3 p-3 bg-opacity-10 bg-info rounded border border-info">
+                            <h6 class="small fw-bold text-dark mb-1"><i class="bi bi-info-circle-fill text-info me-1"></i> Justificativa do Instrutor:</h6>
+                            <p class="small text-muted mb-0">{{ item.question.explanation }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-5 mb-5">
+        <a href="{% url 'courses:course_detail' quiz.course.slug %}" class="btn btn-secondary">Voltar para o Curso</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel Operacional - IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold text-dark"><i class="bi bi-speedometer2 text-danger me-2"></i>Painel do Aluno</h3>
+    <p class="text-muted mb-0">Bem-vindo(a) de volta, {{ user.first_name|default:user.username }}!</p>
+</div>
+
+<!-- 🔔 ÁREA DE NOTIFICAÇÕES (Gatilho da Gamificação e Simulado) -->
+{% if unread_notifications %}
+    <div class="mb-4">
+        <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-bell-fill text-warning me-2"></i>Notificações Recentes</h6>
+        <div class="d-flex flex-column gap-2">
+            {% for notif in unread_notifications %}
+                <div class="alert alert-info d-flex align-items-center shadow-sm border-0 mb-0 py-2" role="alert">
+                    <i class="bi {{ notif.icon }} fs-3 me-3 text-primary"></i>
+                    <div>
+                        <strong class="d-block">{{ notif.title }}</strong>
+                        <span class="small">{{ notif.message }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- ⏰ ALERTA DE VENCIMENTO DE RECICLAGEM (NRs e CBMERJ) -->
+{% if expiring_certificates %}
+    <div class="mb-4">
+        <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Atenção: Reciclagem Próxima</h6>
+        <div class="d-flex flex-column gap-2">
+            {% for cert in expiring_certificates %}
+                <div class="alert alert-danger d-flex align-items-center shadow-sm border-0 mb-0 py-3" role="alert">
+                    <i class="bi bi-shield-exclamation fs-1 me-3"></i>
+                    <div class="flex-grow-1">
+                        <strong>{{ cert.course.title }}</strong><br>
+                        <span class="small">Sua certificação expira em <b>{{ cert.expires_at|date:"d/m/Y" }}</b>. Renove sua qualificação operacional para manter-se apto!</span>
+                    </div>
+                    <a href="{% url 'courses:course_detail' cert.course.slug %}" class="btn btn-danger btn-sm fw-bold shadow-sm text-nowrap ms-3">
+                        <i class="bi bi-arrow-repeat me-1"></i> Iniciar Reciclagem
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- 📚 GRADE DE TREINAMENTOS MATRICULADOS -->
+<h6 class="fw-bold text-secondary mb-3"><i class="bi bi-journal-bookmark-fill text-primary me-2"></i>Meus Treinamentos</h6>
+<div class="row">
+    {% for enrollment in enrollments %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                <div class="bg-dark text-white p-3 text-center">
+                    <i class="bi bi-fire text-danger fs-1"></i>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-danger mb-2">Treinamento Ativo</span>
+                    <h5 class="card-title fw-bold text-dark mb-1">{{ enrollment.course.title }}</h5>
+                    <p class="card-text text-muted small mb-0">{{ enrollment.course.description|truncatewords:15 }}</p>
+                </div>
+                <div class="card-footer bg-white border-top-0 pt-0 pb-3 px-3">
+                    <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="btn btn-outline-danger w-100 fw-bold">
+                        <i class="bi bi-play-circle-fill me-1"></i> Acessar Treinamento
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-light text-center p-5 border shadow-sm rounded-3">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <h5 class="mt-3 fw-bold">Nenhum treinamento matriculado</h5>
+                <p class="text-muted mb-0">Você ainda não está matriculado em nenhum curso da plataforma.</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

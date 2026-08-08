@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .player-layout { display: flex; gap: 20px; }
+    .player-main { flex: 1; }
+    .player-sidebar { width: 340px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; max-height: 85vh; overflow-y: auto; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; border-radius: 8px; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    .pdf-watermark-wrapper { position: relative; width: 100%; height: 600px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+    .pdf-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 24px; color: rgba(220, 53, 69, 0.25); font-weight: bold; pointer-events: none; z-index: 10; text-align: center; }
+    @media (max-width: 991px) { .player-layout { flex-direction: column; } .player-sidebar { width: 100%; max-height: none; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i> Voltar à Grade</a>
+    <span class="badge bg-danger fs-6">{{ course.title }}</span>
+</div>
+
+<div class="player-layout">
+    <!-- Área Principal do Player e Interações -->
+    <div class="player-main">
+        <div class="card p-3 shadow-sm border-0 mb-4">
+            <h4 class="fw-bold mb-1">{{ lesson.title }}</h4>
+            <p class="text-muted small mb-3">Módulo: {{ lesson.module.title }}</p>
+
+            <!-- Exibição por Tipo de Conteúdo -->
+            {% if lesson.content_type == 'VIDEO' %}
+                <div class="video-container mb-3">
+                    <iframe src="https://www.youtube.com/embed/{{ lesson.youtube_video_id }}" allowfullscreen></iframe>
+                </div>
+            {% elif lesson.content_type == 'PDF' %}
+                <div class="pdf-watermark-wrapper mb-3">
+                    <div class="pdf-watermark">{{ user.get_full_name|default:user.username }}<br/>CPF: {{ user.cpf|default:"---" }}</div>
+                    <iframe src="{{ lesson.pdf_storage_path }}" width="100%" height="100%"></iframe>
+                </div>
+            {% elif lesson.content_type == 'TEXT' %}
+                <div class="p-4 bg-light rounded mb-3 border">
+                    {{ lesson.text_content|linebreaks }}
+                </div>
+            {% endif %}
+
+            <!-- Botões de Ação e Navegação -->
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-2">
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" name="toggle_complete" class="btn {% if progress.completed %}btn-success{% else %}btn-outline-success{% endif %} btn-md fw-bold">
+                        <i class="bi {% if progress.completed %}bi-check-circle-fill{% else %}bi-circle{% endif %} me-2"></i>
+                        {% if progress.completed %}Aula Concluída{% else %}Marcar como Concluída{% endif %}
+                    </button>
+                </form>
+
+                <div class="d-flex gap-2">
+                    {% if prev_lesson %}
+                        <a href="{% url 'courses:lesson_view' prev_lesson.id %}" class="btn btn-secondary btn-sm"><i class="bi bi-chevron-left me-1"></i> Anterior</a>
+                    {% endif %}
+                    {% if next_lesson %}
+                        <a href="{% url 'courses:lesson_view' next_lesson.id %}" class="btn btn-primary btn-sm">Próxima <i class="bi bi-chevron-right ms-1"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção: Fórum de Dúvidas da Aula -->
+        <div class="card p-4 shadow-sm border-0 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-chat-dots-fill text-danger me-2"></i>Fórum de Dúvidas da Aula</h5>
+
+            <!-- Formulário para envio de dúvidas -->
+            <form method="post" class="mb-4">
+                {% csrf_token %}
+                <div class="mb-2">
+                    <textarea name="comment_text" class="form-control" rows="3" placeholder="Escreva sua dúvida ou comentário sobre o conteúdo desta aula..." required></textarea>
+                </div>
+                <button type="submit" name="add_comment" class="btn btn-danger btn-sm fw-bold">
+                    <i class="bi bi-send-fill me-1"></i> Publicar Dúvida
+                </button>
+            </form>
+
+            <!-- Lista de Comentários -->
+            <div class="comments-list">
+                {% for comment in comments %}
+                    <div class="p-3 bg-light rounded border mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <strong class="text-dark">{{ comment.user.get_full_name|default:comment.user.username }}</strong>
+                                {% if comment.user.role == 'INSTRUCTOR' or comment.user.is_staff %}
+                                    <span class="badge bg-danger">Instrutor</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">{{ comment.created_at|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <p class="mb-2 text-secondary">{{ comment.text|linebreaksbr }}</p>
+
+                        <!-- Respostas encadeadas -->
+                        {% if comment.replies.exists %}
+                            <div class="ms-4 mt-3 pt-2 border-top">
+                                {% for reply in comment.replies.all %}
+                                    <div class="p-2 bg-white rounded border mb-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <strong class="small">{{ reply.user.get_full_name|default:reply.user.username }}</strong>
+                                            {% if reply.user.role == 'INSTRUCTOR' or reply.user.is_staff %}
+                                                <span class="badge bg-danger" style="font-size: 9px;">Instrutor</span>
+                                            {% endif %}
+                                            <small class="text-muted" style="font-size: 10px;">{{ reply.created_at|date:"d/m/Y H:i" }}</small>
+                                        </div>
+                                        <p class="mb-0 small text-dark">{{ reply.text }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="text-muted small mb-0">Nenhuma dúvida enviada até o momento. Seja o primeiro a perguntar!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar da Grade de Aulas e Materiais de Apoio -->
+    <div class="player-sidebar p-3 shadow-sm">
+        <h6 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-list-ul me-1"></i>Conteúdo do Treinamento</h6>
+        <div class="accordion accordion-flush" id="sidebarAccordion">
+            {% for mod in modules %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button py-2 px-1 small fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#sbMod{{ mod.id }}">
+                            Módulo {{ mod.order }}: {{ mod.title }}
+                        </button>
+                    </h2>
+                    <div id="sbMod{{ mod.id }}" class="accordion-collapse collapse show">
+                        <div class="accordion-body p-0">
+                            <div class="list-group list-group-flush">
+                                {% for les in mod.lessons.all %}
+                                    <a href="{% url 'courses:lesson_view' les.id %}" class="list-group-item list-group-item-action py-2 px-2 small d-flex justify-content-between align-items-center {% if les.id == lesson.id %}active bg-danger border-danger{% endif %}">
+                                        <div>
+                                            {% if les.id in completed_lesson_ids %}
+                                                <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                            {% else %}
+                                                <i class="bi bi-circle text-muted me-1"></i>
+                                            {% endif %}
+                                            {{ les.title }}
+                                        </div>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Materiais Complementares para Download -->
+        {% if lesson.attachments.exists %}
+            <div class="mt-4 pt-3 border-top">
+                <h6 class="fw-bold mb-2 text-danger"><i class="bi bi-paperclip me-1"></i>Materiais de Apoio</h6>
+                <div class="list-group list-group-flush">
+                    {% for att in lesson.attachments.all %}
+                        <a href="{{ att.file_url }}" target="_blank" class="list-group-item list-group-item-action py-2 px-2 small d-flex align-items-center text-primary">
+                            <i class="bi bi-file-earmark-arrow-down fs-5 me-2"></i>
+                            <span class="text-truncate">{{ att.title }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

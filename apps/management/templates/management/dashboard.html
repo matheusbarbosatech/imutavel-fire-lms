@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Backoffice - BI{% endblock %}
+
+{% block content %}
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <h3 class="fw-bold"><i class="bi bi-bar-chart-fill text-danger me-2"></i>Dashboard Gestão</h3>
+    <div>
+        <a href="{% url 'management:enrollment_list' %}" class="btn btn-outline-dark btn-sm me-2">Matrículas</a>
+        <a href="{% url 'management:financial_list' %}" class="btn btn-dark btn-sm">Financeiro</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted fw-bold mb-1">Receita Mensal (Paga)</h6>
+                <h3 class="fw-bold text-success mb-0">R$ {{ revenue_month|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted fw-bold mb-1">Inadimplência (Pendente)</h6>
+                <h3 class="fw-bold text-danger mb-0">R$ {{ pending_revenue|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted fw-bold mb-1">Matrículas Ativas</h6>
+                <h3 class="fw-bold text-primary mb-0">{{ active_enrollments }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted fw-bold mb-1">Matrículas Bloqueadas</h6>
+                <h3 class="fw-bold text-warning mb-0">{{ suspended_enrollments }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 p-4">
+    <h5 class="fw-bold mb-3">Matrículas Recentes</h5>
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Aluno</th>
+                <th>Curso</th>
+                <th>Data</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enr in recent_enrollments %}
+            <tr>
+                <td class="fw-semibold">{{ enr.student.get_full_name }}</td>
+                <td>{{ enr.course.title }}</td>
+                <td>{{ enr.enrolled_at|date:"d/m/Y" }}</td>
+                <td>
+                    {% if enr.is_active %}
+                        <span class="badge bg-success">Ativo</span>
+                    {% else %}
+                        <span class="badge bg-danger">Bloqueado</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

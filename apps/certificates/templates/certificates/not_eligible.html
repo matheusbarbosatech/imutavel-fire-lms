@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Emissão Pendente - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="card shadow-sm border-0 p-4">
+            <i class="bi bi-lock-fill text-warning fs-1 mb-2"></i>
+            <h3 class="fw-bold text-dark">Emissão de Certificado Indisponível</h3>
+            <p class="text-muted mb-4">Você precisa cumprir todos os requisitos do curso <strong>{{ course.title }}</strong> antes de gerar seu documento oficial.</p>
+
+            <div class="row text-start mb-4">
+                <div class="col-md-6 mb-2">
+                    <div class="p-3 border rounded {% if is_lessons_complete %}bg-success-subtle border-success{% else %}bg-light{% endif %}">
+                        {% if is_lessons_complete %}
+                            <i class="bi bi-check-circle-fill text-success me-2"></i><strong>Aulas Concluídas:</strong> {{ completed_lessons }}/{{ total_lessons }} (100%)
+                        {% else %}
+                            <i class="bi bi-exclamation-circle-fill text-danger me-2"></i><strong>Aulas Concluídas:</strong> {{ completed_lessons }}/{{ total_lessons }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <div class="p-3 border rounded {% if has_passed_quiz %}bg-success-subtle border-success{% else %}bg-light{% endif %}">
+                        {% if has_passed_quiz %}
+                            <i class="bi bi-check-circle-fill text-success me-2"></i><strong>Simulado Final:</strong> Aprovado
+                        {% else %}
+                            <i class="bi bi-exclamation-circle-fill text-danger me-2"></i><strong>Simulado Final:</strong> Pendente de Aprovação
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary"><i class="bi bi-arrow-left me-1"></i> Retornar ao Conteúdo do Curso</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

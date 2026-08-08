@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificado Oficial - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <a href="{% url 'certificates:my_documents' %}" class="btn btn-outline-secondary btn-sm mb-2">
+            <i class="bi bi-arrow-left me-1"></i> Voltar para Meus Documentos
+        </a>
+        <h3 class="fw-bold mb-0">Certificado Emitido com Sucesso</h3>
+    </div>
+    {% if cert.pdf_file_path %}
+        <a href="{% url 'certificates:download_certificate_pdf' cert.auth_code %}" class="btn btn-danger btn-lg font-weight-bold shadow-sm">
+            <i class="bi bi-file-earmark-pdf-fill me-2"></i> Baixar PDF Vetorial
+        </a>
+    {% endif %}
+</div>
+
+<!-- Card de Exibição do Certificado Oficial -->
+<div class="card shadow-lg border-0 mb-4">
+    <div class="card-header bg-dark text-white p-4 text-center">
+        <h4 class="text-danger fw-bold mb-1">REPUBLICA FEDERATIVA DO BRASIL — REGISTRO TÉCNICO</h4>
+        <h5 class="fw-bold mb-0 text-uppercase">Certificado de Capacitação Profissional</h5>
+    </div>
+    <div class="card-body p-4 p-md-5 text-center">
+        <p class="fs-5 lh-lg mb-4">
+            Certificamos que <strong class="text-uppercase text-danger fs-4 d-block my-2">{{ user.get_full_name|default:user.username }}</strong>
+            portador(a) do CPF sob nº <strong>{{ user.cpf|default:"---" }}</strong> e Registro Profissional/CBMERJ <strong>{{ user.cbmerj_registration|default:"N/A" }}</strong>,
+            concluiu com êxito o treinamento de qualificação profissional em 
+            <strong class="text-uppercase d-block fs-4 text-dark my-2">{{ course.title }}</strong>
+            com carga horária total de <strong>{{ course.workload_hours }} horas</strong>, cumprindo rigorosamente todas as exigências teóricas, práticas e avaliativas estabelecidas.
+        </p>
+
+        <div class="p-4 bg-light rounded border border-secondary-subtle d-inline-block text-start max-width-600 mx-auto w-100 mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <p class="mb-1 small"><strong>Código Hash de Autenticidade:</strong> <code class="text-danger fw-bold">{{ cert.auth_code }}</code></p>
+                    <p class="mb-1 small"><strong>Data de Emissão:</strong> {{ cert.issued_at|date:"d/m/Y H:i" }}</p>
+                    <p class="mb-1 small"><strong>Validade / Reciclagem:</strong> <span class="text-danger fw-bold">{{ cert.expires_at|date:"d/m/Y"|default:"Indeterminada" }}</span></p>
+                    <p class="mb-0 small text-muted">Assinatura Criptográfica PGP/ICP-Brasil Ativa</p>
+                </div>
+                <div class="col-md-4 text-center mt-3 mt-md-0 border-start">
+                    <span class="badge bg-success p-2 mb-2"><i class="bi bi-shield-check me-1"></i> ICP-Brasil Verificado</span>
+                    <p class="small text-muted mb-0">Documento Válido em todo o Território Nacional</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-3 border-top">
+            <p class="small text-muted mb-2">Para verificar a autenticidade deste documento em tempo real, acesse o link público:</p>
+            <a href="{% url 'certificates:validate_certificate_public' cert.auth_code %}" target="_blank" class="btn btn-outline-dark btn-sm">
+                <i class="bi bi-patch-check-fill text-success me-1"></i> Verificar Autenticidade Pública (Validação CBMERJ / MTE)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

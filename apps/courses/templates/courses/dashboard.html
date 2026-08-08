@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Painel - IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Meus Cursos em Andamento</h2>
+
+<div class="row">
+    {% for item in courses_data %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge bg-danger w-auto mb-2">{{ item.course.get_category_display }}</span>
+                    <h5 class="card-title">{{ item.course.title }}</h5>
+                    <p class="card-text text-muted small mb-3">{{ item.course.workload_hours }} Horas de Carga Horária</p>
+                    
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small fw-bold">Progresso</span>
+                            <span class="small fw-bold">{{ item.progress_percentage }}%</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ item.progress_percentage }}%;"></div>
+                        </div>
+                        <a href="{% url 'courses:course_detail' item.course.slug %}" class="btn btn-primary w-100">Acessar Curso</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">Você ainda não possui matrículas ativas em nenhum curso.</div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
