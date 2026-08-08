@@ -32,23 +32,28 @@ def logout_view(request):
 
 
 def register_view(request):
-    """Auto-cadastro de novos alunos."""
+    """Auto-cadastro de novos alunos com tratamento de exceções completo."""
     if request.user.is_authenticated:
         return redirect('courses:student_dashboard')
         
     if request.method == 'POST':
-        nome = request.POST.get('first_name')
-        email = request.POST.get('email')
-        cpf = request.POST.get('cpf')
-        senha = request.POST.get('password')
-        
-        # 1. Verifica se e-mail já existe
+        nome = request.POST.get('first_name', '').strip()
+        email = request.POST.get('email', '').strip().lower()
+        cpf = request.POST.get('cpf', '').strip()
+        senha = request.POST.get('password', '')
+
+        # 1. Validações básicas antes de chamar o banco
+        if not nome or not email or not senha:
+            messages.error(request, 'Por favor, preencha todos os campos obrigatórios.')
+            return redirect('accounts:register')
+
+        # 2. Checa se e-mail já está cadastrado
         if CustomUser.objects.filter(email=email).exists():
-            messages.error(request, 'Este e-mail já está em uso. Tente fazer login ou recupere sua senha.')
+            messages.error(request, 'Este e-mail já está cadastrado. Tente fazer login ou recupere sua senha.')
             return redirect('accounts:register')
             
         try:
-            # 2. Criação do novo aluno
+            # 3. Instancia o novo aluno
             user = CustomUser(
                 email=email,
                 first_name=nome,
@@ -56,19 +61,20 @@ def register_view(request):
                 role='STUDENT'
             )
             
-            if hasattr(user, 'username'):
-                user.username = email 
+            # Força o username a ser o e-mail para evitar falhas de restrição de unicidade
+            user.username = email
                 
             user.set_password(senha)
             user.save()
             
-            # 3. Loga e envia para os cursos
+            # 4. Faz login e manda para os cursos
             login(request, user)
             messages.success(request, 'Cadastro realizado com sucesso! Bem-vindo(a) ao Imutável Fire.')
             return redirect('courses:student_dashboard')
             
         except Exception as e:
-            messages.error(request, f'Erro ao criar conta: {str(e)}')
+            # Emite a mensagem exata de erro tratada no alerta da tela
+            messages.error(request, f'Erro no banco de dados ao salvar cadastro: {str(e)}')
             return redirect('accounts:register')
             
     return render(request, 'accounts/register.html')
