@@ -1,159 +1,101 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}IMUTÁVEL FIRE LMS{% endblock %}</title>
+    <title>{% block title %}Imutável Fire - LMS{% endblock %}</title>
 
-    <!-- PWA / Mobile (Aplicativo Instalável) -->
-    <link rel="manifest" href="{% static 'manifest.json' %}">
-    <meta name="theme-color" content="#DC3545">
-    <link rel="apple-touch-icon" href="{% static 'img/icon-192.png' %}">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fire-red': '#D32F2F',
+                        'fire-dark': '#9A0007',
+                    }
+                }
+            }
+        }
+    </script>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    
-    <!-- CSS Customizado (Opcional) -->
-    {% block extra_css %}{% endblock %}
-    
-    <style>
-        body { background-color: #f8f9fa; display: flex; flex-direction: column; min-height: 100vh; }
-        .navbar-brand { font-weight: 800; letter-spacing: 1px; }
-        .max-width-800 { max-width: 800px; }
-    </style>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen flex flex-col font-sans text-gray-800">
 
-    <!-- Barra de Navegação Superior -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand text-danger" href="{% url 'courses:student_dashboard' %}">
-                <i class="bi bi-fire me-1"></i>IMUTÁVEL FIRE
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                {% if user.is_authenticated %}
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <!-- Menu Padrão do Aluno -->
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}" href="{% url 'courses:student_dashboard' %}">
-                                <i class="bi bi-journal-bookmark me-1"></i> Meus Cursos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.app_name == 'certificates' %}active{% endif %}" href="{% url 'certificates:my_documents' %}">
-                                <i class="bi bi-file-earmark-check me-1"></i> Documentos & Credenciais
-                            </a>
-                        </li>
+    <!-- Cabeçalho / Navbar -->
+    <nav class="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{% url 'courses:dashboard' %}" class="text-xl font-extrabold tracking-wide text-fire-red flex items-center gap-2 hover:opacity-90 transition">
+                        <i class="fa-solid fa-fire text-2xl text-fire-red"></i> 
+                        <span class="text-white">IMUTÁVEL</span> <span class="text-fire-red">FIRE</span>
+                    </a>
+                </div>
 
-                        <!-- Botões Exclusivos da Administração -->
-                        {% if user.role == 'INSTRUCTOR' or user.role == 'ADMIN' or user.is_staff %}
-                            <li class="nav-item">
-                                <a class="nav-link text-success fw-bold" href="{% url 'management:dashboard' %}">
-                                    <i class="bi bi-briefcase-fill me-1"></i> Backoffice Gestor
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-warning fw-bold" href="{% url 'courses:instructor_dashboard' %}">
-                                    <i class="bi bi-person-workspace me-1"></i> Área do Instrutor
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-info fw-bold" href="/admin/" target="_blank">
-                                    <i class="bi bi-database-fill-gear me-1"></i> Admin Django
-                                </a>
-                            </li>
+                <!-- Menu de Ações / Usuário -->
+                <div class="flex items-center gap-4">
+                    {% if user.is_authenticated %}
+                        <!-- Nome do Usuário -->
+                        <div class="hidden sm:flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fa-solid fa-circle-user text-gray-400 text-lg"></i>
+                            <span>{{ user.first_name|default:user.username }}</span>
+                        </div>
+
+                        <!-- Botão Admin (Apenas Superusuários) -->
+                        {% if user.is_superuser %}
+                            <a href="/admin/" class="bg-red-700 hover:bg-red-800 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow flex items-center gap-1">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span class="hidden md:inline">Painel Admin</span>
+                            </a>
                         {% endif %}
-                    </ul>
 
-                    <!-- Menu do Usuário (Avatar e Logout) -->
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i> {{ user.first_name|default:user.username }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'accounts:profile' %}">
-                                        <i class="bi bi-person-lines-fill me-2 text-danger"></i> Meu Perfil
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <!-- Formulário POST para Logout (Boas Práticas de Segurança) -->
-                                    <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="dropdown-item text-danger fw-bold">
-                                            <i class="bi bi-box-arrow-right me-2"></i> Sair do Sistema
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                {% else %}
-                    <!-- Botão de Login para Visitantes -->
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="btn btn-outline-danger fw-bold" href="{% url 'accounts:login' %}">Acessar Plataforma</a>
-                        </li>
-                    </ul>
-                {% endif %}
+                        <!-- Botão de Sair (Logout) -->
+                        <a href="{% url 'accounts:logout' %}" class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 border border-gray-700">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span class="hidden sm:inline">Sair</span>
+                        </a>
+                    {% else %}
+                        <!-- Botão de Entrar (Login) -->
+                        <a href="{% url 'accounts:login' %}" class="bg-fire-red hover:bg-red-700 text-white font-bold px-5 py-2 rounded-lg text-sm transition shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-right-to-bracket"></i> Entrar
+                        </a>
+                    {% endif %}
+                </div>
+
             </div>
         </div>
     </nav>
 
-    <!-- Área de Conteúdo Principal -->
-    <main class="container py-5 flex-grow-1">
-        
-        <!-- Sistema de Notificações Flash (Alertas de Sucesso/Erro) -->
-        {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm border-0" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    <!-- Mensagens do Django (Notificações/Alertas) -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+                <div class="p-4 rounded-xl text-sm font-semibold shadow-sm mb-2 flex items-center justify-between {% if message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% else %}bg-green-100 text-green-800 border border-green-200{% endif %}">
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove();" class="text-xs font-bold px-2 py-1 opacity-70 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-        <!-- Bloco que será substituído pelas outras páginas HTML -->
+    <!-- Conteúdo Dinâmico das Páginas -->
+    <main class="flex-grow">
         {% block content %}
         {% endblock %}
     </main>
 
     <!-- Rodapé -->
-    <footer class="bg-dark text-white text-center py-4 mt-auto">
-        <div class="container">
-            <small class="text-muted fw-semibold">&copy; {% now "Y" %} IMUTÁVEL FIRE LMS. Plataforma Operacional.</small>
+    <footer class="bg-gray-900 text-gray-400 py-6 text-center text-sm border-t border-gray-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>&copy; {% now "Y" %} Imutável Fire Treinamentos. Todos os direitos reservados.</p>
         </div>
     </footer>
 
-    <!-- Bibliotecas JS do Bootstrap (Essencial para menus e alertas) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- PWA: Script de Registro do Service Worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register("{% static 'sw.js' %}")
-                .then(function(registration) {
-                    console.log('PWA: Service Worker ativado com sucesso.');
-                }, function(err) {
-                    console.log('PWA: Erro no Service Worker - ', err);
-                });
-            });
-        }
-    </script>
-
-    <!-- Bloco para JS específico das outras páginas (Como o Timer do Simulado) -->
-    {% block extra_js %}{% endblock %}
 </body>
 </html>
