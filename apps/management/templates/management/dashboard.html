@@ -1,80 +1,131 @@
 {% extends 'base.html' %}
-{% block title %}Backoffice - BI{% endblock %}
+{% block title %}Dashboard da Secretaria & Gestão — IMUTÁVEL FIRE{% endblock %}
 
 {% block content %}
-<div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <h3 class="fw-bold"><i class="bi bi-bar-chart-fill text-danger me-2"></i>Dashboard Gestão</h3>
-    <div class="d-flex flex-wrap gap-2">
-        <a href="{% url 'management:enrollment_list' %}" class="btn btn-outline-dark btn-sm">Matrículas</a>
-        <a href="{% url 'management:document_list' %}" class="btn btn-outline-danger btn-sm"><i class="bi bi-file-earmark-person me-1"></i> Documentos Secretaria</a>
-        <a href="{% url 'management:financial_list' %}" class="btn btn-dark btn-sm">Financeiro</a>
-        <a href="{% url 'management:export_enrollments_csv' %}" class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel me-1"></i> Exportar CSV Matrículas</a>
-        <a href="{% url 'management:export_payments_csv' %}" class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-excel me-1"></i> Exportar CSV Financeiro</a>
-    </div>
-</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
-            <div class="card-body">
-                <h6 class="text-muted fw-bold mb-1">Receita Mensal (Paga)</h6>
-                <h3 class="fw-bold text-success mb-0">R$ {{ revenue_month|floatformat:2 }}</h3>
+    <!-- Cabeçalho & Ações Rápidas -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 border-b border-slate-200 pb-6 mb-10">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="bi bi-shield-lock-fill text-red-600"></i> Painel de Controle Administrativo
             </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard da Secretaria & BI</h1>
+            <p class="text-slate-500 text-sm mt-1">Gerencie matrículas, conferência de documentos e dados financeiros da escola.</p>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
-            <div class="card-body">
-                <h6 class="text-muted fw-bold mb-1">Inadimplência (Pendente)</h6>
-                <h3 class="fw-bold text-danger mb-0">R$ {{ pending_revenue|floatformat:2 }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
-            <div class="card-body">
-                <h6 class="text-muted fw-bold mb-1">Matrículas Ativas</h6>
-                <h3 class="fw-bold text-primary mb-0">{{ active_enrollments }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 border-start border-warning border-4 h-100">
-            <div class="card-body">
-                <h6 class="text-muted fw-bold mb-1">Matrículas Bloqueadas</h6>
-                <h3 class="fw-bold text-warning mb-0">{{ suspended_enrollments }}</h3>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="card shadow-sm border-0 p-4">
-    <h5 class="fw-bold mb-3">Matrículas Recentes</h5>
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Aluno</th>
-                <th>Curso</th>
-                <th>Data</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for enr in recent_enrollments %}
-            <tr>
-                <td class="fw-semibold">{{ enr.student.get_full_name }}</td>
-                <td>{{ enr.course.title }}</td>
-                <td>{{ enr.enrolled_at|date:"d/m/Y" }}</td>
-                <td>
-                    {% if enr.is_active %}
-                        <span class="badge bg-success">Ativo</span>
-                    {% else %}
-                        <span class="badge bg-danger">Bloqueado</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <div class="flex items-center gap-3 flex-wrap">
+            <a href="{% url 'management:document_list' %}" class="btn-fire text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md">
+                <i class="bi bi-file-earmark-person-fill"></i> Conferir Documentos
+            </a>
+            <a href="{% url 'management:export_enrollments_csv' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md shadow-emerald-900/20">
+                <i class="bi bi-file-earmark-excel-fill"></i> Exportar CSV Matrículas
+            </a>
+            <a href="{% url 'management:export_payments_csv' %}" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700 shadow-sm">
+                <i class="bi bi-file-earmark-excel"></i> Exportar CSV Financeiro
+            </a>
+        </div>
+    </div>
+
+    <!-- Widgets Estatísticos (Métricas de BI) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        
+        <!-- Receita Paga -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm card-hover-lift flex items-center justify-between">
+            <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Receita Mensal Paga</span>
+                <h3 class="text-2xl font-extrabold text-emerald-600">R$ {{ revenue_month|floatformat:2 }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold shrink-0">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+        </div>
+
+        <!-- Inadimplência -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm card-hover-lift flex items-center justify-between">
+            <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Pendente / Inadimplência</span>
+                <h3 class="text-2xl font-extrabold text-red-600">R$ {{ pending_revenue|floatformat:2 }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl font-bold shrink-0">
+                <i class="bi bi-exclamation-octagon-fill"></i>
+            </div>
+        </div>
+
+        <!-- Matrículas Ativas -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm card-hover-lift flex items-center justify-between">
+            <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Matrículas Ativas</span>
+                <h3 class="text-2xl font-extrabold text-slate-900">{{ active_enrollments }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold shrink-0">
+                <i class="bi bi-people-fill"></i>
+            </div>
+        </div>
+
+        <!-- Bloqueados -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm card-hover-lift flex items-center justify-between">
+            <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Acessos Suspensos</span>
+                <h3 class="text-2xl font-extrabold text-amber-600">{{ suspended_enrollments }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold shrink-0">
+                <i class="bi bi-slash-circle-fill"></i>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tabela de Matrículas Recentes -->
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden p-6 md:p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                <i class="bi bi-clock-history text-red-600"></i> Matrículas Recentes na Plataforma
+            </h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] tracking-wider font-extrabold border-b border-slate-200">
+                    <tr>
+                        <th class="py-3.5 px-4 rounded-l-2xl">Aluno(a)</th>
+                        <th class="py-3.5 px-4">Treinamento Habilitado</th>
+                        <th class="py-3.5 px-4">Data da Inscrição</th>
+                        <th class="py-3.5 px-4 rounded-r-2xl text-right">Status do Acesso</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for enr in recent_enrollments %}
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-4 px-4 font-bold text-slate-900 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs">
+                                {{ enr.student.first_name|default:enr.student.username|slice:":1"|upper }}
+                            </div>
+                            <span>{{ enr.student.get_full_name|default:enr.student.username }}</span>
+                        </td>
+                        <td class="py-4 px-4 font-medium text-slate-700">{{ enr.course.title }}</td>
+                        <td class="py-4 px-4 text-xs font-mono text-slate-400">{{ enr.enrolled_at|date:"d/m/Y H:i" }}</td>
+                        <td class="py-4 px-4 text-right">
+                            {% if enr.is_active %}
+                                <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 inline-flex items-center gap-1">
+                                    <i class="bi bi-check-circle-fill"></i> Ativo
+                                </span>
+                            {% else %}
+                                <span class="px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 inline-flex items-center gap-1">
+                                    <i class="bi bi-x-circle-fill"></i> Suspenso
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="py-8 text-center text-xs text-slate-400 italic">Nenhuma matrícula registrada no sistema.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Imutável Fire - LMS{% endblock %}</title>
+    <title>{% block title %}Imutável Fire — Plataforma de Formação Profissional{% endblock %}</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,9 +16,14 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
                     colors: {
-                        'fire-red': '#D32F2F',
-                        'fire-dark': '#9A0007',
+                        'fire-red': '#E53935',
+                        'fire-dark': '#991B1B',
+                        'fire-glow': '#FF5252',
+                        'obsidian': '#0F172A',
                     }
                 }
             }
@@ -24,28 +34,73 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-</head>
-<body class="bg-gray-50 min-h-screen flex flex-col font-sans text-gray-800">
 
-    <!-- Cabeçalho / Navbar -->
-    <nav class="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+        }
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .card-hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .gradient-fire-text {
+            background: linear-gradient(135deg, #FF5252 0%, #E53935 50%, #B71C1C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-dark-banner {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%);
+        }
+        .btn-fire {
+            background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+            box-shadow: 0 4px 14px 0 rgba(229, 57, 53, 0.35);
+            transition: all 0.25s ease;
+        }
+        .btn-fire:hover {
+            background: linear-gradient(135deg, #EF5350 0%, #D32F2F 100%);
+            box-shadow: 0 6px 20px 0 rgba(229, 57, 53, 0.5);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col font-sans text-slate-800 antialiased selection:bg-red-500 selection:text-white">
+
+    <!-- Header Glassmorphic Navbar -->
+    <nav class="glass-nav text-white sticky top-0 z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
+            <div class="flex justify-between h-20 items-center">
                 
                 <!-- Logo e Links de Navegação -->
-                <div class="flex items-center gap-6">
-                    <a href="{% url 'courses:dashboard' %}" class="text-xl font-extrabold tracking-wide text-fire-red flex items-center gap-2 hover:opacity-90 transition">
-                        <i class="fa-solid fa-fire text-2xl text-fire-red"></i> 
-                        <span class="text-white">IMUTÁVEL</span> <span class="text-fire-red">FIRE</span>
+                <div class="flex items-center gap-8">
+                    <a href="{% url 'courses:dashboard' %}" class="group text-xl font-extrabold tracking-tight flex items-center gap-3 transition">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-fire text-xl text-white"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-white text-base font-extrabold leading-none tracking-wider">IMUTÁVEL</span>
+                            <span class="text-fire-red text-xs font-bold tracking-widest uppercase mt-0.5">FIRE LMS</span>
+                        </div>
                     </a>
 
                     {% if user.is_authenticated %}
-                    <a href="{% url 'courses:dashboard' %}" class="hidden md:inline-block text-sm font-medium text-gray-300 hover:text-white transition">
-                        <i class="fa-solid fa-book-open mr-1"></i> Meus Cursos
-                    </a>
-                    <a href="{% url 'certificates:my_certificates' %}" class="hidden md:inline-block text-sm font-medium text-gray-300 hover:text-white transition">
-                        <i class="bi bi-award-fill text-fire-red mr-1"></i> Certificados & Credencial PVC
-                    </a>
+                    <div class="hidden md:flex items-center gap-2 border-l border-slate-700/60 pl-6">
+                        <a href="{% url 'courses:dashboard' %}" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-2">
+                            <i class="bi bi-journal-bookmark-fill text-red-500"></i> Meus Cursos
+                        </a>
+                        <a href="{% url 'certificates:my_certificates' %}" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-2">
+                            <i class="bi bi-award-fill text-amber-400"></i> Certificados & Credencial PVC
+                        </a>
+                    </div>
                     {% endif %}
                 </div>
 
@@ -53,28 +108,30 @@
                 <div class="flex items-center gap-3">
                     {% if user.is_authenticated %}
                         <!-- Identificação do Usuário -->
-                        <div class="hidden sm:flex items-center gap-2 text-sm text-gray-300 mr-2">
-                            <i class="fa-solid fa-circle-user text-gray-400 text-lg"></i>
-                            <span>{{ user.first_name|default:user.username }}</span>
+                        <div class="hidden sm:flex items-center gap-3 bg-slate-800/70 border border-slate-700/80 px-3.5 py-1.5 rounded-full text-xs text-slate-300">
+                            <div class="w-6 h-6 rounded-full bg-red-600 text-white font-bold flex items-center justify-center text-xs">
+                                {{ user.first_name|default:user.username|slice:":1"|upper }}
+                            </div>
+                            <span class="font-semibold text-slate-200">{{ user.first_name|default:user.username }}</span>
                         </div>
 
                         <!-- Botão do Painel de Administração / Secretaria -->
                         {% if user.is_superuser or user.is_staff or user.role == 'ADMIN' %}
-                            <a href="{% url 'management:dashboard' %}" class="bg-fire-red hover:bg-red-700 text-white text-xs md:text-sm font-bold px-3 py-2 rounded-lg transition shadow-md flex items-center gap-2 border border-red-500">
-                                <i class="fa-solid fa-user-shield"></i>
+                            <a href="{% url 'management:dashboard' %}" class="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-lg shadow-red-900/40 flex items-center gap-2 border border-red-500/30">
+                                <i class="bi bi-shield-lock-fill"></i>
                                 <span>Gestão / Secretaria</span>
                             </a>
                         {% endif %}
 
                         <!-- Botão de Sair (Logout) -->
-                        <a href="{% url 'accounts:logout' %}" title="Encerrar Sessão" class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm font-semibold transition border border-gray-700 flex items-center gap-1">
-                            <i class="fa-solid fa-right-from-bracket"></i>
+                        <a href="{% url 'accounts:logout' %}" title="Encerrar Sessão" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition border border-slate-700 flex items-center gap-1.5">
+                            <i class="bi bi-box-arrow-right"></i>
                             <span class="hidden sm:inline">Sair</span>
                         </a>
                     {% else %}
                         <!-- Botão de Entrar (Login) -->
-                        <a href="{% url 'accounts:login' %}" class="bg-fire-red hover:bg-red-700 text-white font-bold px-5 py-2 rounded-lg text-sm transition shadow-md flex items-center gap-2">
-                            <i class="fa-solid fa-right-to-bracket"></i> Entrar
+                        <a href="{% url 'accounts:login' %}" class="btn-fire text-white font-bold px-6 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                            <i class="bi bi-person-fill"></i> Entrar na Área do Aluno
                         </a>
                     {% endif %}
                 </div>
@@ -85,10 +142,13 @@
 
     <!-- Mensagens do Django (Notificações/Alertas) -->
     {% if messages %}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
             {% for message in messages %}
-                <div class="p-4 rounded-xl text-sm font-semibold shadow-sm mb-2 flex items-center justify-between {% if message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% else %}bg-green-100 text-green-800 border border-green-200{% endif %}">
-                    <span>{{ message }}</span>
+                <div class="p-4 rounded-2xl text-sm font-semibold shadow-sm mb-3 flex items-center justify-between transition-all transform duration-300 {% if message.tags == 'error' %}bg-red-50 text-red-900 border border-red-200{% else %}bg-emerald-50 text-emerald-900 border border-emerald-200{% endif %}">
+                    <div class="flex items-center gap-3">
+                        <i class="bi {% if message.tags == 'error' %}bi-exclamation-triangle-fill text-red-600{% else %}bi-check-circle-fill text-emerald-600{% endif %} text-lg"></i>
+                        <span>{{ message }}</span>
+                    </div>
                     <button onclick="this.parentElement.remove();" class="text-xs font-bold px-2 py-1 opacity-70 hover:opacity-100">&times;</button>
                 </div>
             {% endfor %}
@@ -101,10 +161,21 @@
         {% endblock %}
     </main>
 
-    <!-- Rodapé -->
-    <footer class="bg-gray-900 text-gray-400 py-6 text-center text-sm border-t border-gray-800 mt-12">
-        <div class="max-w-7xl mx-auto px-4">
-            <p>&copy; {% now "Y" %} Imutável Fire Treinamentos. Todos os direitos reservados.</p>
+    <!-- Rodapé Premium -->
+    <footer class="bg-slate-900 text-slate-400 py-10 text-sm border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-fire text-sm"></i>
+                    </div>
+                    <span class="font-extrabold text-white tracking-wider">IMUTÁVEL FIRE</span>
+                    <span class="text-xs text-slate-500">| Formação Profissional & Capacitação Operacional</span>
+                </div>
+                <div class="text-center md:text-right text-xs text-slate-500">
+                    <p>&copy; {% now "Y" %} Imutável Fire Treinamentos. Sistema Registrado NBR 14608 / CBMERJ.</p>
+                </div>
+            </div>
         </div>
     </footer>
 

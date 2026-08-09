@@ -1,64 +1,111 @@
 {% extends 'base.html' %}
 
-{% block title %}Meus Certificados e Credenciais - IMUTÁVEL FIRE{% endblock %}
+{% block title %}Meus Certificados & Credenciais — IMUTÁVEL FIRE{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Header da Seção -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6 mb-10">
         <div>
-            <h2 class="fw-bold mb-1"><i class="bi bi-patch-check-fill text-danger me-2"></i>Meus Certificados & Credenciais</h2>
-            <p class="text-muted small mb-0">Consulte e baixe seus certificados oficiais e credenciais em PVC de Bombeiro Civil.</p>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="bi bi-patch-check-fill text-amber-500"></i> Registro de Documentos Oficiais
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Meus Certificados & Credenciais PVC</h1>
+            <p class="text-slate-500 text-sm mt-1">Consulte seus certificados de capacitação e faça o download da sua Credencial Operacional em PVC.</p>
         </div>
+        <a href="{% url 'courses:student_dashboard' %}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow transition">
+            <i class="bi bi-arrow-left"></i> Voltar para Meus Cursos
+        </a>
     </div>
 
-    <div class="row">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {% for cert in certificates %}
-            <div class="col-md-6 mb-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                        <span class="badge bg-danger"><i class="bi bi-shield-check me-1"></i> REGISTRO ATIVO</span>
-                        <small class="text-white-50">Cód: {{ cert.code }}</small>
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-md overflow-hidden card-hover-lift flex flex-col">
+                
+                <!-- Mockup Visual de Cartão PVC (Frente) -->
+                <div class="gradient-dark-banner p-6 text-white relative overflow-hidden border-b border-slate-700/60">
+                    <div class="absolute -right-6 -top-6 w-32 h-32 bg-red-600/20 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-700/60 pb-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-red-500 text-lg"></i>
+                            <span class="text-xs font-extrabold tracking-widest text-slate-200 uppercase">CREDENCIAL OPERACIONAL</span>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full bg-red-600/30 border border-red-500/40 text-red-300 text-[10px] font-bold tracking-wider uppercase">
+                            PVC NBR 14608
+                        </span>
                     </div>
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold text-dark mb-2">{{ cert.course.title }}</h5>
-                        
-                        <div class="p-3 bg-light rounded border mb-3">
-                            <div class="row text-center">
-                                <div class="col-6 border-end">
-                                    <small class="text-muted d-block">Data de Emissão</small>
-                                    <strong class="small text-dark">{{ cert.issued_at|date:"d/m/Y" }}</strong>
-                                </div>
-                                <div class="col-6">
-                                    <small class="text-muted d-block">Validade</small>
-                                    <strong class="small text-success">Indeterminada</strong>
-                                </div>
-                            </div>
+
+                    <div class="flex gap-4 items-center">
+                        <div class="w-16 h-20 bg-slate-800 rounded-xl border border-slate-600 flex flex-col items-center justify-center text-slate-400 shrink-0">
+                            {% if user.photo %}
+                                <img src="{{ user.photo.url }}" class="w-full h-full object-cover rounded-xl" alt="Foto">
+                            {% else %}
+                                <i class="bi bi-person-fill text-3xl text-slate-500"></i>
+                                <span class="text-[9px] font-bold uppercase mt-1">FOTO 3X4</span>
+                            {% endif %}
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <a href="{% url 'certificates:download_pdf' cert.id %}" class="btn btn-danger btn-md fw-bold shadow-sm" target="_blank">
-                                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Baixar Certificado (PDF)
-                            </a>
-                            <a href="{% url 'certificates:download_pvc_card' cert.id %}" class="btn btn-dark btn-md fw-bold shadow-sm" target="_blank">
-                                <i class="bi bi-credit-card-2-front-fill me-1 text-danger"></i> Baixar Carteirinha PVC (Bombeiro Civil)
-                            </a>
+                        <div class="space-y-1 text-xs">
+                            <h4 class="text-sm font-extrabold text-white uppercase tracking-tight">{{ user.get_full_name|default:user.username }}</h4>
+                            <p class="text-slate-300"><strong>CPF:</strong> {{ user.cpf|default:"---" }}</p>
+                            <p class="text-slate-300"><strong>REG. CBMERJ:</strong> <span class="text-red-400 font-bold">{{ user.cbmerj_registration|default:"Em Emissão" }}</span></p>
+                            <p class="text-slate-300"><strong>TIPO SANGUÍNEO:</strong> <span class="text-cyan-400 font-bold">{{ user.blood_type|default:"A+" }}</span></p>
                         </div>
                     </div>
-                    <div class="card-footer bg-light text-center py-2">
-                        <small class="text-muted">
-                            Validação Pública: <a href="{% url 'certificates:verify_certificate' cert.code %}" target="_blank" class="text-decoration-none fw-bold text-danger">Verificar Autenticidade <i class="bi bi-box-arrow-up-right ms-1"></i></a>
-                        </small>
+                </div>
+
+                <!-- Detalhes do Certificado -->
+                <div class="p-6 flex-1 flex flex-col justify-between space-y-6">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold text-slate-900">{{ cert.course.title }}</h3>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-4">Código de Registro: <code class="text-red-600 font-bold">{{ cert.code }}</code></p>
+
+                        <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-100 text-center text-xs">
+                            <div>
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold">Data de Emissão</span>
+                                <strong class="text-slate-800 font-bold">{{ cert.issued_at|date:"d/m/Y" }}</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px] uppercase font-bold">Validade / Status</span>
+                                <strong class="text-emerald-600 font-bold">Indeterminada (Ativo)</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Download -->
+                    <div class="space-y-3 pt-2">
+                        <a href="{% url 'certificates:download_pdf' cert.id %}" target="_blank" class="btn-fire text-white font-bold py-3 px-4 rounded-2xl text-xs uppercase tracking-wider block text-center shadow-md flex items-center justify-center gap-2">
+                            <i class="bi bi-file-earmark-pdf-fill text-base"></i> Baixar Certificado Oficial (PDF)
+                        </a>
+                        <a href="{% url 'certificates:download_pvc_card' cert.id %}" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-2xl text-xs uppercase tracking-wider block text-center border border-slate-700 shadow-sm flex items-center justify-center gap-2 transition">
+                            <i class="bi bi-credit-card-2-front-fill text-base text-red-500"></i> Baixar Credencial PVC Operacional
+                        </a>
                     </div>
                 </div>
+
+                <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 text-center text-xs text-slate-500">
+                    <a href="{% url 'certificates:verify_certificate' cert.code %}" target="_blank" class="text-red-600 font-bold hover:underline flex items-center justify-center gap-1">
+                        <i class="bi bi-shield-check"></i> Verificar Autenticidade Pública (QR Code) <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+                    </a>
+                </div>
+
             </div>
         {% empty %}
-            <div class="col-12">
-                <div class="card p-5 text-center shadow-sm border-0">
-                    <i class="bi bi-award text-muted fs-1 mb-3"></i>
-                    <h5 class="fw-bold">Nenhum certificado emitido ainda</h5>
-                    <p class="text-muted">Conclua 100% das aulas de um curso para liberar seus documentos e credencial operacional.</p>
-                    <div class="mt-2">
-                        <a href="{% url 'courses:student_dashboard' %}" class="btn btn-danger"><i class="bi bi-journal-bookmark me-1"></i> Ir para Meus Cursos</a>
+            <div class="lg:col-span-2">
+                <div class="bg-white p-12 rounded-3xl border border-slate-200 text-center shadow-sm">
+                    <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Nenhum certificado emitido ainda</h3>
+                    <p class="text-slate-500 text-sm mt-2 max-w-md mx-auto">Conclua 100% das aulas teóricas e práticas do seu treinamento para liberar o download do seu Certificado Oficial e da Credencial PVC.</p>
+                    <div class="mt-6">
+                        <a href="{% url 'courses:student_dashboard' %}" class="btn-fire text-white text-sm font-bold px-6 py-3 rounded-2xl inline-flex items-center gap-2">
+                            <i class="bi bi-journal-bookmark me-1"></i> Ir para Meus Cursos
+                        </a>
                     </div>
                 </div>
             </div>

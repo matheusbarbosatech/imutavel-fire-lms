@@ -1,87 +1,100 @@
 {% extends 'base.html' %}
 
-{% block title %}Conferência de Documentos de Alunos - Gestão{% endblock %}
+{% block title %}Conferência de Documentos — Secretaria IMUTÁVEL FIRE{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Cabeçalho -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6 mb-10">
         <div>
-            <h2 class="fw-bold mb-1"><i class="bi bi-file-earmark-person-fill text-danger me-2"></i>Documentos de Matrícula (Secretaria)</h2>
-            <p class="text-muted small mb-0">Validação e conferência dos documentos anexados pelos alunos (RG, CPF, ASO, Comprovantes).</p>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="bi bi-file-earmark-person-fill text-red-600"></i> Secretaria Acadêmica
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Fila de Conferência de Documentos</h1>
+            <p class="text-slate-500 text-sm mt-1">Validação e aprovação dos documentos anexados pelos alunos (RG, CPF, ASO, Comprovante de Residência).</p>
         </div>
-        <div>
-            <a href="{% url 'management:dashboard' %}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-arrow-left me-1"></i> Voltar ao Painel
-            </a>
+        <a href="{% url 'management:dashboard' %}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow transition">
+            <i class="bi bi-arrow-left"></i> Voltar ao Painel
+        </a>
+    </div>
+
+    <!-- Tabela de Documentos -->
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden p-6 md:p-8">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] tracking-wider font-extrabold border-b border-slate-200">
+                    <tr>
+                        <th class="py-3.5 px-4 rounded-l-2xl">Aluno(a)</th>
+                        <th class="py-3.5 px-4">Tipo de Documento</th>
+                        <th class="py-3.5 px-4">Arquivo Anexo</th>
+                        <th class="py-3.5 px-4">Data de Envio</th>
+                        <th class="py-3.5 px-4">Status de Verificação</th>
+                        <th class="py-3.5 px-4 rounded-r-2xl text-right">Ação Rápida</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for doc in documents %}
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="py-4 px-4 font-bold text-slate-900 flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-2xl bg-red-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">
+                                    {{ doc.user.first_name|default:doc.user.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <span class="block font-bold text-slate-900">{{ doc.user.get_full_name|default:doc.user.username }}</span>
+                                    <span class="text-xs text-slate-400 font-normal">{{ doc.user.email }}</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-200">
+                                    {{ doc.get_doc_type_display }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4">
+                                {% if doc.file %}
+                                    <a href="{{ doc.file.url }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl transition">
+                                        <i class="bi bi-paperclip"></i> Visualizar Arquivo
+                                    </a>
+                                {% else %}
+                                    <span class="text-slate-400 text-xs italic">Sem anexo</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-4 text-xs font-mono text-slate-400">{{ doc.uploaded_at|date:"d/m/Y H:i" }}</td>
+                            <td class="py-4 px-4">
+                                {% if doc.is_verified %}
+                                    <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 inline-flex items-center gap-1">
+                                        <i class="bi bi-check-circle-fill"></i> Aprovado / Verificado
+                                    </span>
+                                {% else %}
+                                    <span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200 inline-flex items-center gap-1">
+                                        <i class="bi bi-hourglass-split"></i> Pendente de Conferência
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-4 text-right">
+                                {% if not doc.is_verified %}
+                                    <a href="{% url 'management:document_action' doc.id 'aprovar' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow-sm transition inline-flex items-center gap-1">
+                                        <i class="bi bi-check-lg"></i> Aprovar
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'management:document_action' doc.id 'rejeitar' %}" class="bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-700 border border-slate-200 text-xs font-bold px-3.5 py-1.5 rounded-xl transition inline-flex items-center gap-1">
+                                        <i class="bi bi-x-lg"></i> Rejeitar
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="py-12 text-center text-xs text-slate-400 italic">
+                                <i class="bi bi-inbox text-3xl block mb-2 text-slate-300"></i>
+                                Nenhum documento enviado para a fila da secretaria até o momento.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-dark text-white py-3">
-            <h5 class="fw-bold mb-0">Fila de Documentos de Alunos</h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Aluno</th>
-                            <th>Tipo de Documento</th>
-                            <th>Arquivo Anexo</th>
-                            <th>Data Envio</th>
-                            <th>Status Verificação</th>
-                            <th class="text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for doc in documents %}
-                            <tr>
-                                <td>
-                                    <strong class="d-block text-dark">{{ doc.user.get_full_name|default:doc.user.username }}</strong>
-                                    <small class="text-muted">{{ doc.user.email }}</small>
-                                </td>
-                                <td><span class="badge bg-secondary">{{ doc.get_doc_type_display }}</span></td>
-                                <td>
-                                    {% if doc.file %}
-                                        <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-paperclip me-1"></i> Visualizar Arquivo
-                                        </a>
-                                    {% else %}
-                                        <span class="text-muted small">Sem arquivo</span>
-                                    {% endif %}
-                                </td>
-                                <td><small class="text-muted">{{ doc.uploaded_at|date:"d/m/Y H:i" }}</small></td>
-                                <td>
-                                    {% if doc.is_verified %}
-                                        <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i> Aprovado / Verificado</span>
-                                    {% else %}
-                                        <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Pendente de Conferência</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    {% if not doc.is_verified %}
-                                        <a href="{% url 'management:document_action' doc.id 'aprovar' %}" class="btn btn-sm btn-success fw-bold me-1">
-                                            <i class="bi bi-check-lg"></i> Aprovar
-                                        </a>
-                                    {% else %}
-                                        <a href="{% url 'management:document_action' doc.id 'rejeitar' %}" class="btn btn-sm btn-outline-danger fw-bold">
-                                            <i class="bi bi-x-lg"></i> Rejeitar
-                                        </a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
-                                    <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-                                    Nenhum documento enviado pelos alunos até o momento.
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}
