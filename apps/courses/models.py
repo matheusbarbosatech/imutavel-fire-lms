@@ -73,6 +73,20 @@ class Lesson(models.Model):
     def __str__(self):
         return f"{self.module.title} - {self.title}"
 
+    @property
+    def get_embed_video_url(self):
+        """Converte dinamicamente links do YouTube/Vimeo em formato de embed seguro para iframe."""
+        if not self.video_url:
+            return ""
+        url = self.video_url.strip()
+        if "youtube.com/watch?v=" in url:
+            video_id = url.split("watch?v=")[-1].split("&")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
+        elif "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[-1].split("?")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
+        return url
+
 
 class Enrollment(models.Model):
     """Matrículas dos alunos em cada curso."""
