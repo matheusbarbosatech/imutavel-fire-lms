@@ -85,6 +85,9 @@ class Lesson(models.Model):
         elif "youtu.be/" in url:
             video_id = url.split("youtu.be/")[-1].split("?")[0]
             return f"https://www.youtube.com/embed/{video_id}"
+        elif "youtube.com/shorts/" in url:
+            video_id = url.split("youtube.com/shorts/")[-1].split("?")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
         return url
 
 

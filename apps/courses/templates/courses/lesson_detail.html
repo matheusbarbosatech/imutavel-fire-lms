@@ -41,7 +41,9 @@
                         <iframe 
                             class="absolute top-0 left-0 w-full h-full border-0"
                             src="{{ lesson.get_embed_video_url }}" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            title="{{ lesson.title }}"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin"
                             allowfullscreen>
                         </iframe>
                     </div>
