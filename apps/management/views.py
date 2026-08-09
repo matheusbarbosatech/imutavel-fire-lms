@@ -1,39 +1,46 @@
+import logging
+import mercadopago
 from django.conf import settings
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
+from django.db import transaction
+
 from apps.accounts.models import CustomUser
 from apps.courses.models import Course, Enrollment
+from .decorators import admin_required
+
+logger = logging.getLogger(__name__)
+
+def get_mp_sdk():
+    """Retorna o SDK do Mercado Pago inicializado de forma segura."""
+    token = getattr(settings, 'MP_ACCESS_TOKEN', '') or ''
+    if not token:
+        logger.warning("MP_ACCESS_TOKEN não configurado em settings.")
+    return mercadopago.SDK(token)
 
 
 def landing_page_view(request):
-    """
-    Landing Page pública na raiz (/)
-    Exibe a Landing Page para todos (anônimos e logados), sem redirecionamento forçado.
-    """
+    """Landing Page pública do sistema na raiz (/)."""
     try:
         cursos_disponiveis = Course.objects.all()[:3]
-    except Exception:
+    except Exception as e:
+        logger.error(f"Erro ao carregar cursos na Landing Page: {e}")
         cursos_disponiveis = []
 
-    context = {
-        'cursos': cursos_disponiveis,
-    }
+    context = {'cursos': cursos_disponiveis}
     return render(request, 'management/landing_page.html', context)
 
 
-@login_required
+@admin_required
 def dashboard_view(request):
-    """Painel Administrativo / Gestor (Com fallback para a dashboard do aluno)"""
-    if getattr(request.user, 'role', '') != 'ADMIN' and not request.user.is_superuser:
-        return redirect('courses:dashboard')
-
+    """Painel de BI e Métricas do Gestor."""
     try:
         total_alunos = CustomUser.objects.filter(role='STUDENT').count()
         total_cursos = Course.objects.count()
         total_matriculas = Enrollment.objects.count()
-    except Exception:
+    except Exception as e:
+        logger.error(f"Erro ao carregar métricas da dashboard: {e}")
         total_alunos = total_cursos = total_matriculas = 0
 
     context = {
@@ -44,27 +51,24 @@ def dashboard_view(request):
     try:
         return render(request, 'management/dashboard.html', context)
     except Exception as e:
-        print(f"Erro ao renderizar management/dashboard.html: {e}")
+        logger.error(f"Erro ao renderizar template da dashboard: {e}")
         return redirect('courses:dashboard')
 
 
-@login_required
+@admin_required
 def enrollment_list_view(request):
-    """Lista de matrículas para gestão"""
-    if getattr(request.user, 'role', '') != 'ADMIN' and not request.user.is_superuser:
-        return redirect('courses:dashboard')
+    """Listagem otimizada de matrículas."""
     try:
         matriculas = Enrollment.objects.all().select_related('student', 'course')
         return render(request, 'management/enrollment_list.html', {'matriculas': matriculas})
-    except Exception:
+    except Exception as e:
+        logger.error(f"Erro ao buscar matrículas: {e}")
         return redirect('courses:dashboard')
 
 
-@login_required
+@admin_required
 def enrollment_action_view(request, enrollment_id, action):
-    """Ações de aprovar ou bloquear matrículas"""
-    if getattr(request.user, 'role', '') != 'ADMIN' and not request.user.is_superuser:
-        return redirect('courses:dashboard')
+    """Ações rápidas de alteração de status de matrícula."""
     try:
         enrollment = Enrollment.objects.get(id=enrollment_id)
         if action == 'aprovar':
@@ -73,51 +77,46 @@ def enrollment_action_view(request, enrollment_id, action):
         elif action == 'bloquear':
             enrollment.is_active = False
             enrollment.save()
-    except Exception:
-        pass
+    except Enrollment.DoesNotExist:
+        logger.warning(f"Matrícula {enrollment_id} não encontrada.")
+    except Exception as e:
+        logger.error(f"Erro ao alterar status da matrícula {enrollment_id}: {e}")
+
     return redirect('management:enrollment_list')
 
 
-@login_required
+@admin_required
 def financial_list_view(request):
-    """Painel financeiro do gestor"""
-    if getattr(request.user, 'role', '') != 'ADMIN' and not request.user.is_superuser:
-        return redirect('courses:dashboard')
-    try:
-        return render(request, 'management/financial_list.html')
-    except Exception:
-        return redirect('courses:dashboard')
+    """Visão geral do financeiro."""
+    return render(request, 'management/financial_list.html')
 
 
-@login_required
+@admin_required
 def register_payment_view(request, payment_id):
-    """Baixa de pagamentos manuais"""
-    if getattr(request.user, 'role', '') != 'ADMIN' and not request.user.is_superuser:
-        return redirect('courses:dashboard')
+    """Baixa de pagamentos manuais."""
     return redirect('management:financial_list')
 
 
 def criar_pagamento_mercadopago(request):
-    """Gera a preferência no Mercado Pago com log de erro detalhado"""
+    """Gera a preferência de pagamento no Mercado Pago e redireciona o aluno."""
     if request.method == 'POST':
-        nome_curso = request.POST.get('curso_nome', 'Imutável Fire - Acesso Completo')
-        preco = float(request.POST.get('preco', 97.00))
-        email_aluno = request.POST.get('email', 'aluno@email.com')
+        nome_curso = request.POST.get('curso_nome', 'Curso Profissional Bombeiro Civil')
+        preco = request.POST.get('preco', '750.00')
+        email_aluno = request.POST.get('email', '').strip()
 
-        token = getattr(settings, 'MP_ACCESS_TOKEN', None)
-        if not token or 'seu-token-aqui' in token:
-            print("⚠️ ATENÇÃO: Variável MP_ACCESS_TOKEN não configurada corretamente!")
+        if not email_aluno:
+            return redirect('management:landing_page')
 
         try:
-            import mercadopago
-            sdk = mercadopago.SDK(token)
+            preco_float = float(preco)
+            sdk = get_mp_sdk()
 
             preference_data = {
                 "items": [
                     {
                         "title": str(nome_curso),
                         "quantity": 1,
-                        "unit_price": float(preco),
+                        "unit_price": preco_float,
                         "currency_id": "BRL"
                     }
                 ],
@@ -134,35 +133,30 @@ def criar_pagamento_mercadopago(request):
             }
 
             preference_response = sdk.preference().create(preference_data)
-            print(f"📊 Resposta do Mercado Pago: {preference_response}")
-
             response_data = preference_response.get("response", {})
             init_point = response_data.get("init_point") or response_data.get("sandbox_init_point")
 
             if init_point:
                 return redirect(init_point)
-            else:
-                print(f"❌ Não foi possível obter init_point. Resposta: {response_data}")
+            
+            logger.error(f"Mercado Pago não retornou init_point: {response_data}")
 
         except Exception as e:
-            print(f"❌ Exceção crítica ao comunicar com Mercado Pago: {e}")
+            logger.error(f"Exceção ao comunicar com Mercado Pago: {e}")
 
     return redirect('management:landing_page')
 
 
 @csrf_exempt
 def mercadopago_webhook(request):
-    """Processa a aprovação do pagamento e libera a matrícula automaticamente."""
+    """Webhook silencioso para aprovação de pagamento e liberação de acesso."""
     if request.method == 'POST':
         topic = request.GET.get('topic') or request.POST.get('type') or request.GET.get('type')
         payment_id = request.GET.get('id') or request.POST.get('data.id') or request.GET.get('data.id')
 
-        if (topic == 'payment' or topic == 'merchant_order') and payment_id:
+        if (topic in ['payment', 'merchant_order']) and payment_id:
             try:
-                import mercadopago
-                token = getattr(settings, 'MP_ACCESS_TOKEN', None)
-                sdk = mercadopago.SDK(token)
-
+                sdk = get_mp_sdk()
                 payment_info = sdk.payment().get(payment_id)
                 payment = payment_info.get("response", payment_info)
 
@@ -170,25 +164,31 @@ def mercadopago_webhook(request):
                     email_comprador = payment.get("payer", {}).get("email")
 
                     if email_comprador:
-                        user, created = CustomUser.objects.get_or_create(
-                            email=email_comprador,
-                            defaults={
-                                'first_name': email_comprador.split('@')[0],
-                                'role': 'STUDENT',
-                                'username': email_comprador
-                            }
-                        )
-                        if created:
-                            user.set_password('MudeSuaSenha123')
-                            user.save()
+                        with transaction.atomic():
+                            user, created = CustomUser.objects.get_or_create(
+                                email=email_comprador,
+                                defaults={
+                                    'first_name': email_comprador.split('@')[0],
+                                    'role': 'STUDENT',
+                                    'username': email_comprador
+                                }
+                            )
+                            if created:
+                                user.set_password('MudeSuaSenha123')
+                                user.save()
 
-                        # Libera o acesso a todos os cursos para o comprador
-                        cursos = Course.objects.all()
-                        for curso in cursos:
-                            Enrollment.objects.get_or_create(student=user, course=curso, defaults={'is_active': True})
-                        print(f"🎉 Matrícula liberada automaticamente para: {email_comprador}")
+                            cursos = Course.objects.all()
+                            for curso in cursos:
+                                Enrollment.objects.get_or_create(
+                                    student=user, 
+                                    course=curso, 
+                                    defaults={'is_active': True}
+                                )
+                            logger.info(f"Matrícula ativada automaticamente: {email_comprador}")
 
             except Exception as e:
-                print(f"❌ Erro no processamento do webhook: {e}")
+                logger.error(f"Erro no processamento do webhook Mercado Pago: {e}")
+
+        return HttpResponse(status=200)
 
     return HttpResponse(status=200)
