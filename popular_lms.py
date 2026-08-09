@@ -1,196 +1,237 @@
 import os
 import django
 
-# Configura o ambiente do Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+# Configuração do ambiente Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 from apps.courses.models import Course, Module, Lesson, Quiz, Question, Answer, Enrollment
+from django.contrib.auth import get_user_model
 
-def popular_banco():
-    print("🧹 Limpando dados antigos do banco de dados...")
-    
-    # Apaga dados antigos para evitar conflitos
+User = get_user_model()
+
+
+def run_populate():
+    print("🧹 [1/4] Limpando dados antigos dos cursos, módulos, aulas e quizzes...")
+    Answer.objects.all().delete()
+    Question.objects.all().delete()
     Quiz.objects.all().delete()
     Lesson.objects.all().delete()
     Module.objects.all().delete()
-    Enrollment.objects.all().delete()
     Course.objects.all().delete()
-    
-    print("✨ Banco de dados limpo com sucesso!")
-    print("🔥 Cadastrando nova estrutura oficial do Imutável Fire...")
+    print("✅ Dados antigos limpos com sucesso!")
+
+    print("\n🔥 [2/4] Cadastrando estrutura oficial de cursos do Imutável Fire...")
 
     # ==========================================
-    # 1. CURSO: BOMBEIRO CIVIL (80h)
+    # CURSO 1: Formação de Bombeiro Civil (80h)
     # ==========================================
-    curso_bc = Course.objects.create(
-        title="Formação de Bombeiro Civil",
-        description="Curso profissionalizante de Formação de Bombeiro Civil em conformidade com a Resolução SEDEC/CBMERJ N° 31.",
+    course_bc = Course.objects.create(
+        title="Formação de Bombeiro Civil - 80h",
+        description="Treinamento completo profissional para prevenção, combate a incêndios, abandono de área e primeiros socorros avançados conforme NBR 14608.",
         is_active=True
     )
 
+    # Módulo 1.1
     m1_bc = Module.objects.create(
-        course=curso_bc,
-        title="Módulo 1: Teoria do Fogo e Equipamentos de Combate",
+        course=course_bc,
+        title="Módulo 1: Teoria do Fogo e Combate a Incêndios",
         order=1
     )
-    aulas_m1_bc = [
-        "1.1 Introdução à Profissão e Legislação do Bombeiro Civil",
-        "1.2 Química e Física do Fogo (Tetraedro do Fogo)",
-        "1.3 Classes de Incêndio e Agentes Extintores",
-        "1.4 Operação de Extintores e Carretas Manuais",
-        "1.5 Sistemas Fixos, Sprinklers e Hidrantes"
-    ]
-    for idx, titulo in enumerate(aulas_m1_bc, 1):
-        Lesson.objects.create(
-            module=m1_bc,
-            title=titulo,
-            order=idx,
-            content=f"Espaço reservado para o texto explicativo, resumos ou links em PDF da aula '{titulo}'.",
-            video_url=""
-        )
 
-    m2_bc = Module.objects.create(
-        course=curso_bc,
-        title="Módulo 2: Equipamentos Especiais, Helipontos e Riscos",
+    l1_bc = Lesson.objects.create(
+        module=m1_bc,
+        title="Aula 1: Química e Física do Fogo",
+        content="""
+        <h3>Triângulo e Tetraedro do Fogo</h3>
+        <p>Para que ocorra o fogo, é necessária a presença de quatro elementos essenciais:</p>
+        <ul>
+            <li><strong>Combustível:</strong> É o material que queima (Sólido, Líquido ou Gasoso).</li>
+            <li><strong>Comburente (Oxigênio):</strong> O gás que alimenta a reação química.</li>
+            <li><strong>Calor:</strong> A energia de ativação inicial.</li>
+            <li><strong>Reação em Cadeia:</strong> O processo químico auto-sustentável.</li>
+        </ul>
+        <p>A remoção de qualquer um desses elementos resultará na extinção do fogo.</p>
+        """,
+        video_url="https://www.youtube.com/embed/dQw4w9WgXcQ",
+        order=1
+    )
+
+    l2_bc = Lesson.objects.create(
+        module=m1_bc,
+        title="Aula 2: Classes de Incêndio e Extintores",
+        content="""
+        <h3>Classes de Incêndio e Agentes Extintores</h3>
+        <p>Conheça os principais tipos de fogo e como combatê-los de forma segura:</p>
+        <ul>
+            <li><strong>Classe A:</strong> Sólidos (papel, madeira, tecido). <em>Extintor: Água ou Pó ABC.</em></li>
+            <li><strong>Classe B:</strong> Líquidos Inflamáveis (gasolina, álcool). <em>Extintor: CO2 ou Pó BC/ABC.</em></li>
+            <li><strong>Classe C:</strong> Equipamentos Elétricos Energizados. <em>Extintor: CO2 ou Pó ABC. NUNCA use água!</em></li>
+            <li><strong>Classe D:</strong> Metais Pirofóricos (magnésio, titânio). <em>Extintor: Pó Especial Classe D.</em></li>
+        </ul>
+        """,
+        video_url="https://www.youtube.com/embed/dQw4w9WgXcQ",
         order=2
     )
-    aulas_m2_bc = [
-        "2.1 EPI e Equipamento de Proteção Respiratória (EPR)",
-        "2.2 Emergências em Elevadores e Planos de Emergência",
-        "2.3 Prevenção e Segurança em Áreas de Pouso (Helipontos)",
-        "2.4 Introdução aos Produtos Perigosos e Espaços Confinados"
-    ]
-    for idx, titulo in enumerate(aulas_m2_bc, 1):
-        Lesson.objects.create(
-            module=m2_bc,
-            title=titulo,
-            order=idx,
-            content=f"Espaço reservado para a aula '{titulo}'.",
-            video_url=""
-        )
 
-    m3_bc = Module.objects.create(
-        course=curso_bc,
-        title="Módulo 3: Atendimento Pré-Hospitalar (APH) & SBV",
-        order=3
+    # Quiz da Aula 2
+    quiz_bc = Quiz.objects.create(
+        lesson=l2_bc,
+        title="Avaliação de Classes de Incêndio",
+        min_score=70.0
     )
-    aulas_m3_bc = [
-        "3.1 Aspectos Legais, Biossegurança e Avaliação Inicial",
-        "3.2 Vias Aéreas e Suporte Básico de Vida (SBV / RCP)",
-        "3.3 Controle de Hemorragias e Estado de Choque",
-        "3.4 Fraturas, Imobilizações, Ferimentos e Queimaduras",
-        "3.5 Emergências Clínicas e Transporte de Vítimas"
-    ]
-    for idx, titulo in enumerate(aulas_m3_bc, 1):
-        Lesson.objects.create(
-            module=m3_bc,
-            title=titulo,
-            order=idx,
-            content=f"Conteúdo teórico de APH para '{titulo}'.",
-            video_url=""
-        )
+    q1 = Question.objects.create(quiz=quiz_bc, text="Qual o extintor NUNCA deve ser usado em incêndios da Classe C (Elétrico Energizado)?")
+    Answer.objects.create(question=q1, text="Água Pressurizada (AP)", is_correct=True)
+    Answer.objects.create(question=q1, text="Gás Carbônico (CO2)", is_correct=False)
+    Answer.objects.create(question=q1, text="Pó Químico Seco (PQS)", is_correct=False)
 
-    m4_bc = Module.objects.create(
-        course=curso_bc,
-        title="Módulo 4: Etapa Prática Presencial no Polo",
-        order=4
+    q2 = Question.objects.create(quiz=quiz_bc, text="Líquidos inflamáveis como gasolina e óleo pertencem a qual classe de incêndio?")
+    Answer.objects.create(question=q2, text="Classe A", is_correct=False)
+    Answer.objects.create(question=q2, text="Classe B", is_correct=True)
+    Answer.objects.create(question=q2, text="Classe C", is_correct=False)
+
+    # Módulo 1.2
+    m2_bc = Module.objects.create(
+        course=course_bc,
+        title="Módulo 2: APH - Atendimento Pré-Hospitalar",
+        order=2
     )
+
     Lesson.objects.create(
-        module=m4_bc,
-        title="4.1 Instruções e Agendamento para o Treinamento Prático",
-        order=1,
-        content="Instruções de comparecimento ao polo físico (Endereço: Estrada do Campinho, n.4700). Trazer uniforme e documento com foto.",
-        video_url=""
+        module=m2_bc,
+        title="Aula 1: Protocolo XABCDE do Trauma",
+        content="""
+        <h3>Avaliação Primária de Emergência</h3>
+        <p>Siga rigorosamente a ordem de atendimento ao acidentado:</p>
+        <ol>
+            <li><strong>X (Exsanguinação):</strong> Controle de hemorragias graves.</li>
+            <li><strong>A (Airway):</strong> Vias aéreas e controle da coluna cervical.</li>
+            <li><strong>B (Breathing):</strong> Ventilação e respiração.</li>
+            <li><strong>C (Circulation):</strong> Circulação e controle de choque.</li>
+            <li><strong>D (Disability):</strong> Exame neurológico rápido (Escala de Glasgow).</li>
+            <li><strong>E (Exposure):</strong> Exposição total com prevenção da hipotermia.</li>
+        </ol>
+        """,
+        video_url="https://www.youtube.com/embed/dQw4w9WgXcQ",
+        order=1
     )
 
     # ==========================================
-    # 2. CURSO: NR 35 - TRABALHO EM ALTURA (8h)
+    # CURSO 2: NR-35 - Trabalho em Altura (16h)
     # ==========================================
-    curso_nr35 = Course.objects.create(
-        title="NR 35 - Segurança no Trabalho em Altura",
-        description="Capacitação para trabalho em altura conforme diretrizes da Norma Regulamentadora 35.",
+    course_nr35 = Course.objects.create(
+        title="NR-35 - Segurança no Trabalho em Altura",
+        description="Norma Regulamentadora para capacitação de trabalhadores autorizados e supervisores em trabalhos realizados acima de 2,00m do nível inferior.",
         is_active=True
     )
+
     m1_nr35 = Module.objects.create(
-        course=curso_nr35,
-        title="Módulo 1: Teoria e Gestão de Riscos em Altura",
+        course=course_nr35,
+        title="Módulo 1: Requisitos Normativos e EPIs",
         order=1
     )
-    aulas_nr35 = [
-        "1.1 Normas, Regulamentos e Responsabilidades",
-        "1.2 Análise de Risco (AR) e Condições Impeditivas",
-        "1.3 Equipamentos de Proteção Coletiva (EPC) e Individual (EPI)",
-        "1.4 Sistemas de Ancoragem, Nós e Voltas",
-        "1.5 Noções de Resgate e Primeiros Socorros em Altura"
-    ]
-    for idx, titulo in enumerate(aulas_nr35, 1):
-        Lesson.objects.create(
-            module=m1_nr35,
-            title=titulo,
-            order=idx,
-            content=f"Material da NR-35 sobre '{titulo}'.",
-            video_url=""
-        )
+
+    l1_nr35 = Lesson.objects.create(
+        module=m1_nr35,
+        title="Aula 1: Permissão de Trabalho (PT) e Análise de Risco (APR)",
+        content="""
+        <h3>Documentação Obrigatória para Trabalho em Altura</h3>
+        <p>Todo trabalho em altura acima de 2 metros exige:</p>
+        <ul>
+            <li><strong>Análise Preliminar de Risco (APR):</strong> Mapeamento antecedente de todos os perigos no local.</li>
+            <li><strong>Permissão de Trabalho (PT):</strong> Documento emitido e assinado autorizando a execução da tarefa específica.</li>
+            <li><strong>EPIs Básicos:</strong> Cinto de segurança tipo paraquedista, talabarte duplo com absorvedor de energia e capacete com jugular.</li>
+        </ul>
+        """,
+        video_url="https://www.youtube.com/embed/dQw4w9WgXcQ",
+        order=1
+    )
 
     # ==========================================
-    # 3. CURSO: NR 33 - ESPAÇOS CONFINADOS (16h)
+    # CURSO 3: NR-33 - Espaço Confinado (16h)
     # ==========================================
-    curso_nr33 = Course.objects.create(
-        title="NR 33 - Segurança em Espaços Confinados",
-        description="Treinamento para Trabalhadores Autorizados e Vigias em conformidade com a Portaria MTE 1.409/2012.",
+    course_nr33 = Course.objects.create(
+        title="NR-33 - Segurança em Espaços Confinados",
+        description="Treinamento de segurança para Trabalhadores Autorizados e Vigias em ambientes não projetados para ocupação humana contínua.",
         is_active=True
     )
+
     m1_nr33 = Module.objects.create(
-        course=curso_nr33,
-        title="Módulo 1: Reconhecimento e Medidas de Segurança",
+        course=course_nr33,
+        title="Módulo 1: Reconhecimento e Monitoramento de Atmosferas",
         order=1
     )
-    aulas_nr33 = [
-        "1.1 Definição de Espaços Confinados e Identificação de Riscos",
-        "1.2 Papéis e Responsabilidades: Empregador, Supervisor e Vigia",
-        "1.3 Emissão e Preenchimento da Permissão de Entrada e Trabalho (PET)",
-        "1.4 Monitoramento Atmosférico (Teste do Ar) e Ventilação",
-        "1.5 Medidas de Isolamento, EPI/EPR e Procedimentos de Resgate"
-    ]
-    for idx, titulo in enumerate(aulas_nr33, 1):
-        Lesson.objects.create(
-            module=m1_nr33,
-            title=titulo,
-            order=idx,
-            content=f"Material da NR-33 sobre '{titulo}'.",
-            video_url=""
-        )
+
+    Lesson.objects.create(
+        module=m1_nr33,
+        title="Aula 1: A Importância do Vigia e a PET",
+        content="""
+        <h3>O Papel do Vigia na NR-33</h3>
+        <p>O Vigia deve permanecer fora do espaço confinado durante toda a operação, sendo responsável por:</p>
+        <ul>
+            <li>Manter a contagem contínua do número de trabalhadores autorizados.</li>
+            <li>Operar os detectores contínuos de gás.</li>
+            <li>Acionar a equipe de resgate em caso de emergência. NUNCA entrar no espaço confinado para resgate sem equipamento autônomo!</li>
+        </ul>
+        """,
+        video_url="https://www.youtube.com/embed/dQw4w9WgXcQ",
+        order=1
+    )
 
     # ==========================================
-    # 4. CURSO: NR 20 - INFLAMÁVEIS E COMBUSTÍVEIS (4h)
+    # CURSO 4: NR-20 - Inflamáveis e Combustíveis
     # ==========================================
-    curso_nr20 = Course.objects.create(
-        title="NR 20 - Líquidos Combustíveis e Inflamáveis",
-        description="Curso Básico / Iniciação sobre prevenção e controle no manuseio de inflamáveis e combustíveis.",
+    course_nr20 = Course.objects.create(
+        title="NR-20 - Segurança com Inflamáveis e Combustíveis",
+        description="Treinamento sobre extração, produção, armazenamento, transferência, manuseio e manipulação de inflamáveis e líquidos combustíveis.",
         is_active=True
     )
+
     m1_nr20 = Module.objects.create(
-        course=curso_nr20,
-        title="Módulo 1: Conceitos e Ações Operacionais",
+        course=course_nr20,
+        title="Módulo 1: Propriedades dos Inflamáveis",
         order=1
     )
-    aulas_nr20 = [
-        "1.1 Legislação e Classificação de Inflamáveis e Combustíveis",
-        "1.2 Guia de Procedimentos de Emergência",
-        "1.3 EPIs e EPRs Indicados para Vapores e Inflamáveis",
-        "1.4 Ações Operacionais de Primeira Resposta"
-    ]
-    for idx, titulo in enumerate(aulas_nr20, 1):
-        Lesson.objects.create(
-            module=m1_nr20,
-            title=titulo,
-            order=idx,
-            content=f"Material da NR-20 sobre '{titulo}'.",
-            video_url=""
-        )
 
-    print("🎉 Povoamento limpo e finalizado com sucesso!")
+    Lesson.objects.create(
+        module=m1_nr20,
+        title="Aula 1: Ponto de Fulgor e Ponto de Combustão",
+        content="""
+        <h3>Definições da NR-20</h3>
+        <p>Entenda a classificação dos combustíveis e inflamáveis:</p>
+        <ul>
+            <li><strong>Líquidos Inflamáveis:</strong> Possuem ponto de fulgor inferior a 60°C.</li>
+            <li><strong>Líquidos Combustíveis:</strong> Possuem ponto de fulgor maior ou igual a 60°C e menor ou igual a 93°C.</li>
+        </ul>
+        """,
+        video_url="https://www.youtube.com/embed/dQw4w9WgXcQ",
+        order=1
+    )
 
-if __name__ == '__main__':
-    popular_banco()
+    print("\n🎓 [3/4] Matriculando usuários existentes nos cursos...")
+    users = User.objects.all()
+    all_courses = [course_bc, course_nr35, course_nr33, course_nr20]
+
+    count_enrollments = 0
+    for user in users:
+        for course in all_courses:
+            Enrollment.objects.get_or_create(
+                student=user,
+                course=course,
+                defaults={'is_active': True}
+            )
+            count_enrollments += 1
+
+    print(f"✅ Realizadas {count_enrollments} matrículas de teste com sucesso!")
+
+    print("\n🎉 [4/4] POVOAMENTO COMPLETO E FINALIZADO COM SUCESSO!")
+    print(f"📊 Resumo do Banco:")
+    print(f"   • Cursos Criados: {Course.objects.count()}")
+    print(f"   • Módulos Criados: {Module.objects.count()}")
+    print(f"   • Aulas Criadas: {Lesson.objects.count()}")
+    print(f"   • Quizzes Criados: {Quiz.objects.count()}")
+    print(f"   • Perguntas Criadas: {Question.objects.count()}")
+
+
+if __name__ == "__main__":
+    run_populate()
