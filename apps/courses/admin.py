@@ -66,3 +66,19 @@ class QuestionAdmin(admin.ModelAdmin):
     list_filter = ('quiz',)
     search_fields = ('text',)
     inlines = [AnswerInline]
+
+
+from .models import LessonProgress, LessonComment
+
+@admin.register(LessonProgress)
+class LessonProgressAdmin(admin.ModelAdmin):
+    list_display = ('student', 'lesson', 'completed', 'completed_at')
+    list_filter = ('completed', 'lesson__module__course')
+    search_fields = ('student__username', 'student__email', 'lesson__title')
+
+
+@admin.register(LessonComment)
+class LessonCommentAdmin(admin.ModelAdmin):
+    list_display = ('user', 'lesson', 'text', 'created_at')
+    list_filter = ('lesson__module__course', 'created_at')
+    search_fields = ('user__username', 'text', 'lesson__title')

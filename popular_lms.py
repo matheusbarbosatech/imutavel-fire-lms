@@ -1,5 +1,12 @@
 import os
+import sys
 import django
+
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 # Configuração do ambiente Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")

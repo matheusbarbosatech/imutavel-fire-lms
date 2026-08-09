@@ -100,9 +100,29 @@
                 </div>
             {% endif %}
 
-            <!-- 4. Seção de Avaliação / Quiz (se houver quiz cadastrado) -->
+            <!-- 4. Marcar Aula como Concluída -->
+            <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-700">Status de Aprendizado</h3>
+                    <p class="text-xs text-gray-500">Marque a aula como concluída para atualizar seu progresso no curso.</p>
+                </div>
+                <form action="{% url 'courses:toggle_lesson_completion' lesson.id %}" method="POST">
+                    {% csrf_token %}
+                    {% if is_completed %}
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> Aula Concluída (Clique para Desmarcar)
+                        </button>
+                    {% else %}
+                        <button type="submit" class="bg-fire-red hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center gap-2">
+                            <i class="fa-regular fa-circle-check"></i> Marcar como Concluída
+                        </button>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- 5. Seção de Avaliação / Quiz (se houver quiz cadastrado) -->
             {% if quiz %}
-                <div class="mt-8 pt-6 border-t border-gray-200">
+                <div class="mt-6 pt-6 border-t border-gray-200">
                     <div class="bg-slate-900 text-white rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-fire-red rounded-xl flex items-center justify-center text-2xl">
@@ -119,6 +139,45 @@
                     </div>
                 </div>
             {% endif %}
+
+            <!-- 6. Seção de Dúvidas / Fórum da Aula -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-fire-red"></i> Dúvidas e Comentários da Aula
+                </h2>
+
+                <form action="{% url 'courses:post_lesson_comment' lesson.id %}" method="POST" class="mb-6 space-y-3">
+                    {% csrf_token %}
+                    <textarea name="comment_text" rows="3" required placeholder="Tem alguma dúvida sobre esta aula? Digite aqui para instrutores e colegas responderem..." class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-fire-red focus:border-transparent text-sm text-gray-800"></textarea>
+                    <div class="text-right">
+                        <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold px-6 py-2.5 rounded-lg transition">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> Enviar Dúvida
+                        </button>
+                    </div>
+                </form>
+
+                <div class="space-y-4">
+                    {% for comment in comments %}
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-fire-red text-white font-bold rounded-full flex items-center justify-center text-xs">
+                                        {{ comment.user.first_name|default:comment.user.username|slice:":1"|upper }}
+                                    </div>
+                                    <span class="font-bold text-gray-900 text-sm">{{ comment.user.get_full_name|default:comment.user.username }}</span>
+                                    {% if comment.user.role == 'INSTRUCTOR' or comment.user.is_superuser %}
+                                        <span class="bg-red-100 text-fire-red text-xs px-2 py-0.5 rounded-full font-bold">Instrutor</span>
+                                    {% endif %}
+                                </div>
+                                <span class="text-xs text-gray-400">{{ comment.created_at|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <p class="text-sm text-gray-700 leading-relaxed">{{ comment.text }}</p>
+                        </div>
+                    {% empty %}
+                        <p class="text-sm text-gray-400 italic text-center py-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">Nenhuma dúvida enviada para esta aula ainda. Seja o primeiro a comentar!</p>
+                    {% endfor %}
+                </div>
+            </div>
 
         </div>
     </div>

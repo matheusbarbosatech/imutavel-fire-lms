@@ -120,3 +120,20 @@ def generate_certificate_pdf(certificate, base_url="http://127.0.0.1:8000"):
     certificate.pdf_file = f"certificates/{pdf_filename}"
     certificate.save(update_fields=['pdf_file'])
     return certificate.pdf_file.name
+
+
+import uuid
+
+def issue_certificate_for_user(user, course, base_url="http://127.0.0.1:8000"):
+    """Emite ou recupera o certificado do aluno para um determinado curso e gera o PDF."""
+    from .models import Certificate
+    certificate = Certificate.objects.filter(student=user, course=course).first()
+    if not certificate:
+        code = f"CERT-{course.id}-{user.id}-{uuid.uuid4().hex[:8].upper()}"
+        certificate = Certificate.objects.create(
+            student=user,
+            course=course,
+            code=code
+        )
+    generate_certificate_pdf(certificate, base_url=base_url)
+    return certificate

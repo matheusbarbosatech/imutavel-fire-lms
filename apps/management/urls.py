@@ -17,4 +17,10 @@ urlpatterns = [
     # 💳 Rotas de Checkout e Webhook (Mercado Pago)
     path('pagar/', views.criar_pagamento_mercadopago, name='criar_pagamento'),
     path('pagamentos/webhook/', views.mercadopago_webhook, name='mercadopago_webhook'),
+
+    # 📑 Gestão de Documentos da Secretaria e Exportações CSV
+    path('documentos/', views.document_verification_list_view, name='document_list'),
+    path('documentos/<int:doc_id>/<str:action>/', views.document_verify_action_view, name='document_action'),
+    path('exportar/matriculas/', views.export_enrollments_csv_view, name='export_enrollments_csv'),
+    path('exportar/financeiro/', views.export_payments_csv_view, name='export_payments_csv'),
 ]

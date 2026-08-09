@@ -27,9 +27,10 @@ def take_quiz_view(request, quiz_id):
         score = (correct_answers / total_questions * 100) if total_questions > 0 else 0
         passed = score >= quiz.min_score
 
-        # Salva o registro da tentativa
+        # Salva o registro da tentativa associando ao aluno logado
         StudentQuizAttempt.objects.create(
-            course=quiz.lesson.module.course if quiz.lesson else None,
+            student=request.user,
+            course=quiz.lesson.module.course if (quiz.lesson and quiz.lesson.module) else None,
             lesson=quiz.lesson,
             score=score,
             passed=passed

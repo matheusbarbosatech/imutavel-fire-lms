@@ -157,3 +157,56 @@ class Answer(models.Model):
     def __str__(self):
         correta = " (Correta)" if self.is_correct else ""
         return f"{self.text}{correta}"
+
+
+class LessonProgress(models.Model):
+    """Rastreamento de conclusão de aulas por aluno."""
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='lesson_progress',
+        verbose_name="Aluno"
+    )
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='progress',
+        verbose_name="Aula"
+    )
+    completed = models.BooleanField(default=False, verbose_name="Concluída?")
+    completed_at = models.DateTimeField(auto_now=True, verbose_name="Data de Conclusão")
+
+    class Meta:
+        verbose_name = "Progresso de Aula"
+        verbose_name_plural = "Progresso de Aulas"
+        unique_together = ('student', 'lesson')
+
+    def __str__(self):
+        status = "Concluída" if self.completed else "Pendente"
+        return f"{self.student.get_full_name() or self.student.username} - {self.lesson.title} ({status})"
+
+
+class LessonComment(models.Model):
+    """Comentários e dúvidas dos alunos por aula."""
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name="Aula"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='lesson_comments',
+        verbose_name="Usuário"
+    )
+    text = models.TextField(verbose_name="Dúvida / Comentário")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data do Comentário")
+
+    class Meta:
+        verbose_name = "Dúvida/Comentário da Aula"
+        verbose_name_plural = "Dúvidas/Comentários das Aulas"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} em {self.lesson.title}: {self.text[:30]}"

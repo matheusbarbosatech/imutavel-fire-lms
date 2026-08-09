@@ -192,3 +192,80 @@ def mercadopago_webhook(request):
         return HttpResponse(status=200)
 
     return HttpResponse(status=200)
+
+
+import csv
+from apps.accounts.models import StudentDocument
+from .models import Payment
+
+@admin_required
+def document_verification_list_view(request):
+    """Listagem de documentos de matrícula enviados pelos alunos para conferência da secretaria."""
+    documents = StudentDocument.objects.all().select_related('user').order_by('-uploaded_at')
+    return render(request, 'management/document_list.html', {'documents': documents})
+
+
+@admin_required
+def document_verify_action_view(request, doc_id, action):
+    """Aprova ou rejeita a verificação de um documento de aluno."""
+    try:
+        doc = StudentDocument.objects.get(id=doc_id)
+        if action == 'aprovar':
+            doc.is_verified = True
+            doc.save()
+        elif action == 'rejeitar':
+            doc.is_verified = False
+            doc.save()
+    except StudentDocument.DoesNotExist:
+        logger.warning(f"Documento {doc_id} não encontrado.")
+    return redirect('management:document_list')
+
+
+@admin_required
+def export_enrollments_csv_view(request):
+    """Exporta a lista completa de matrículas em formato CSV."""
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="matriculas_imutavel.csv"'
+    response.write('\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Aluno', 'E-mail', 'CPF', 'Curso', 'Data Matrícula', 'Status'])
+
+    enrollments = Enrollment.objects.all().select_related('student', 'course')
+    for e in enrollments:
+        writer.writerow([
+            e.id,
+            e.student.get_full_name() or e.student.username,
+            e.student.email,
+            getattr(e.student, 'cpf', ''),
+            e.course.title,
+            e.enrolled_at.strftime('%d/%m/%Y %H:%M'),
+            'Ativa' if e.is_active else 'Inativa'
+        ])
+
+    return response
+
+
+@admin_required
+def export_payments_csv_view(request):
+    """Exporta o relatório financeiro em formato CSV."""
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="financeiro_imutavel.csv"'
+    response.write('\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response)
+    writer.writerow(['ID Fatura', 'Aluno', 'Valor (R$)', 'Vencimento', 'Data Pagamento', 'Método', 'Status'])
+
+    payments = Payment.objects.all().select_related('enrollment__student')
+    for p in payments:
+        writer.writerow([
+            p.id,
+            p.enrollment.student.get_full_name() or p.enrollment.student.username,
+            str(p.amount),
+            p.due_date.strftime('%d/%m/%Y') if p.due_date else '',
+            p.payment_date.strftime('%d/%m/%Y') if p.payment_date else '',
+            p.get_payment_method_display(),
+            p.get_status_display()
+        ])
+
+    return response

@@ -12,7 +12,7 @@
             <p class="lead mb-2">Você atingiu <strong>{{ score|floatformat:1 }}%</strong> de aproveitamento.</p>
             <p class="text-muted small">Parabéns! Seu certificado em PDF foi gerado e enviado para o seu e-mail.</p>
             <div class="mt-4">
-                <a href="{% url 'certificates:my_documents' %}" class="btn btn-danger fw-bold px-4 py-2">
+                <a href="{% url 'certificates:my_certificates' %}" class="btn btn-danger fw-bold px-4 py-2">
                     <i class="bi bi-award-fill me-2"></i> Ver Meus Documentos
                 </a>
             </div>
@@ -20,7 +20,7 @@
             <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
             <h2 class="fw-bold mt-3 text-danger">Reprovado</h2>
             <p class="lead mb-2">Você atingiu <strong>{{ score|floatformat:1 }}%</strong> de aproveitamento.</p>
-            <p class="text-muted small">A nota mínima exigida para este treinamento é de {{ quiz.passing_score }}%. Estude o gabarito abaixo e tente novamente.</p>
+            <p class="text-muted small">A nota mínima exigida para este treinamento é de {{ quiz.min_score }}%. Estude o gabarito abaixo e tente novamente.</p>
             <div class="mt-4">
                 <a href="{% url 'quizzes:take_quiz' quiz.id %}" class="btn btn-outline-danger fw-bold px-4 py-2">
                     <i class="bi bi-arrow-repeat me-2"></i> Refazer Simulado
@@ -72,7 +72,11 @@
     </div>
 
     <div class="text-center mt-5 mb-5">
-        <a href="{% url 'courses:course_detail' quiz.course.slug %}" class="btn btn-secondary">Voltar para o Curso</a>
+        {% if quiz.lesson and quiz.lesson.module %}
+            <a href="{% url 'courses:course_detail' quiz.lesson.module.course.id %}" class="btn btn-secondary">Voltar para o Curso</a>
+        {% else %}
+            <a href="{% url 'courses:student_dashboard' %}" class="btn btn-secondary">Voltar para Meus Cursos</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

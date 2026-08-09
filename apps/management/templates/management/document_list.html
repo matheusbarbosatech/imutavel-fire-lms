@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Conferência de Documentos de Alunos - Gestão{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-file-earmark-person-fill text-danger me-2"></i>Documentos de Matrícula (Secretaria)</h2>
+            <p class="text-muted small mb-0">Validação e conferência dos documentos anexados pelos alunos (RG, CPF, ASO, Comprovantes).</p>
+        </div>
+        <div>
+            <a href="{% url 'management:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Voltar ao Painel
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white py-3">
+            <h5 class="fw-bold mb-0">Fila de Documentos de Alunos</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Tipo de Documento</th>
+                            <th>Arquivo Anexo</th>
+                            <th>Data Envio</th>
+                            <th>Status Verificação</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in documents %}
+                            <tr>
+                                <td>
+                                    <strong class="d-block text-dark">{{ doc.user.get_full_name|default:doc.user.username }}</strong>
+                                    <small class="text-muted">{{ doc.user.email }}</small>
+                                </td>
+                                <td><span class="badge bg-secondary">{{ doc.get_doc_type_display }}</span></td>
+                                <td>
+                                    {% if doc.file %}
+                                        <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-paperclip me-1"></i> Visualizar Arquivo
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted small">Sem arquivo</span>
+                                    {% endif %}
+                                </td>
+                                <td><small class="text-muted">{{ doc.uploaded_at|date:"d/m/Y H:i" }}</small></td>
+                                <td>
+                                    {% if doc.is_verified %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i> Aprovado / Verificado</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Pendente de Conferência</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if not doc.is_verified %}
+                                        <a href="{% url 'management:document_action' doc.id 'aprovar' %}" class="btn btn-sm btn-success fw-bold me-1">
+                                            <i class="bi bi-check-lg"></i> Aprovar
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'management:document_action' doc.id 'rejeitar' %}" class="btn btn-sm btn-outline-danger fw-bold">
+                                            <i class="bi bi-x-lg"></i> Rejeitar
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                                    Nenhum documento enviado pelos alunos até o momento.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

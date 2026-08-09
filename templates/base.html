@@ -22,6 +22,8 @@
 
     <!-- FontAwesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col font-sans text-gray-800">
 
@@ -30,7 +32,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 
-                <!-- Logo -->
+                <!-- Logo e Links de Navegação -->
                 <div class="flex items-center gap-6">
                     <a href="{% url 'courses:dashboard' %}" class="text-xl font-extrabold tracking-wide text-fire-red flex items-center gap-2 hover:opacity-90 transition">
                         <i class="fa-solid fa-fire text-2xl text-fire-red"></i> 
@@ -40,6 +42,9 @@
                     {% if user.is_authenticated %}
                     <a href="{% url 'courses:dashboard' %}" class="hidden md:inline-block text-sm font-medium text-gray-300 hover:text-white transition">
                         <i class="fa-solid fa-book-open mr-1"></i> Meus Cursos
+                    </a>
+                    <a href="{% url 'certificates:my_certificates' %}" class="hidden md:inline-block text-sm font-medium text-gray-300 hover:text-white transition">
+                        <i class="bi bi-award-fill text-fire-red mr-1"></i> Certificados & Credencial PVC
                     </a>
                     {% endif %}
                 </div>
@@ -53,11 +58,11 @@
                             <span>{{ user.first_name|default:user.username }}</span>
                         </div>
 
-                        <!-- Botão do Painel de Administração / Instrutor -->
-                        {% if user.is_superuser or user.is_staff %}
-                            <a href="/admin/" target="_blank" class="bg-fire-red hover:bg-red-700 text-white text-xs md:text-sm font-bold px-3 py-2 rounded-lg transition shadow-md flex items-center gap-2 border border-red-500">
+                        <!-- Botão do Painel de Administração / Secretaria -->
+                        {% if user.is_superuser or user.is_staff or user.role == 'ADMIN' %}
+                            <a href="{% url 'management:dashboard' %}" class="bg-fire-red hover:bg-red-700 text-white text-xs md:text-sm font-bold px-3 py-2 rounded-lg transition shadow-md flex items-center gap-2 border border-red-500">
                                 <i class="fa-solid fa-user-shield"></i>
-                                <span>Painel do Gestor / Admin</span>
+                                <span>Gestão / Secretaria</span>
                             </a>
                         {% endif %}
 
