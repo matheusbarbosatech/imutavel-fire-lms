@@ -15,13 +15,16 @@
         </div>
 
         <div class="flex items-center gap-3 flex-wrap">
-            <a href="{% url 'management:document_list' %}" class="btn-fire text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md">
-                <i class="bi bi-file-earmark-person-fill"></i> Conferir Documentos
+            <a href="{% url 'management:course_manage_list' %}" class="btn-fire text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md">
+                <i class="bi bi-folder-plus"></i> Gerenciar Cursos & Conteúdo
+            </a>
+            <a href="{% url 'management:document_list' %}" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700 shadow-sm">
+                <i class="bi bi-file-earmark-person-fill text-red-500"></i> Conferir Documentos
             </a>
             <a href="{% url 'management:export_enrollments_csv' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md shadow-emerald-900/20">
                 <i class="bi bi-file-earmark-excel-fill"></i> Exportar CSV Matrículas
             </a>
-            <a href="{% url 'management:export_payments_csv' %}" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700 shadow-sm">
+            <a href="{% url 'management:export_payments_csv' %}" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700 shadow-sm">
                 <i class="bi bi-file-earmark-excel"></i> Exportar CSV Financeiro
             </a>
         </div>

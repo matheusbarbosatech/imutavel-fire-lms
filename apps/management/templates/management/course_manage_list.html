@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Cursos & Conteúdo — IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Cabeçalho -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6 mb-10">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="bi bi-gear-wide-connected text-red-600"></i> Painel do Instrutor & Gestor
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestão de Cursos, Módulos & Aulas</h1>
+            <p class="text-slate-500 text-sm mt-1">Gerencie a estrutura dos treinamentos, cadastre vídeo-aulas, arquivos em PDF e simulados.</p>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+            <a href="{% url 'management:create_lesson' %}" class="btn-fire text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md">
+                <i class="bi bi-plus-circle-fill"></i> Cadastrar Nova Aula
+            </a>
+            <button onclick="document.getElementById('modalCourse').classList.remove('hidden');" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700 shadow-sm">
+                <i class="bi bi-folder-plus"></i> Criar Novo Curso
+            </button>
+        </div>
+    </div>
+
+    <!-- Lista de Cursos e Estruturas de Conteúdo -->
+    <div class="space-y-8">
+        {% for course in courses %}
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+                <div class="gradient-dark-banner p-6 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-700">
+                    <div>
+                        <span class="text-xs font-extrabold text-red-400 uppercase tracking-widest block mb-1">Curso Habilitado</span>
+                        <h2 class="text-xl font-extrabold text-white">{{ course.title }}</h2>
+                        <p class="text-xs text-slate-300 mt-1 max-w-2xl line-clamp-1">{{ course.description }}</p>
+                    </div>
+                    <button onclick="document.getElementById('modalModule_{{ course.id }}').classList.remove('hidden');" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-md shrink-0">
+                        <i class="bi bi-plus-lg"></i> Adicionar Módulo
+                    </button>
+                </div>
+
+                <!-- Módulos do Curso -->
+                <div class="p-6 space-y-6">
+                    {% for module in course.modules.all %}
+                        <div class="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                                <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                                    <i class="bi bi-folder-fill text-amber-500"></i>
+                                    <span>Módulo {{ module.order }}: {{ module.title }}</span>
+                                </h3>
+                                <a href="{% url 'management:create_lesson' %}?module_id={{ module.id }}" class="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                                    <i class="bi bi-plus-circle"></i> Add Aula Neste Módulo
+                                </a>
+                            </div>
+
+                            <!-- Aulas do Módulo -->
+                            <div class="space-y-2">
+                                {% for lesson in module.lessons.all %}
+                                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                                {{ lesson.order }}
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-slate-900 text-sm">{{ lesson.title }}</h4>
+                                                <div class="flex items-center gap-3 text-xs text-slate-400 mt-0.5">
+                                                    {% if lesson.video_url %}
+                                                        <span class="text-emerald-600 font-bold flex items-center gap-1"><i class="bi bi-play-btn-fill"></i> Vídeo Integrado</span>
+                                                    {% endif %}
+                                                    {% if lesson.attachment %}
+                                                        <span class="text-blue-600 font-bold flex items-center gap-1"><i class="bi bi-paperclip"></i> Anexo (PDF)</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <a href="{% url 'courses:lesson_detail' lesson.id %}" target="_blank" class="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                                                <i class="bi bi-eye-fill"></i> Ver Aula
+                                            </a>
+                                            <a href="{% url 'management:edit_lesson' lesson.id %}" class="text-xs font-bold text-slate-800 hover:bg-slate-100 bg-white border border-slate-300 px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </a>
+                                            <a href="{% url 'management:create_quiz' lesson.id %}" class="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                                                <i class="bi bi-clipboard-check-fill"></i> Simulado / Quiz
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <p class="text-xs text-slate-400 italic py-2">Nenhuma aula cadastrada neste módulo ainda.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Modal para Adicionar Módulo -->
+                        <div id="modalModule_{{ course.id }}" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                            <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                                    <h3 class="font-extrabold text-slate-900 text-base">Novo Módulo para {{ course.title }}</h3>
+                                    <button onclick="document.getElementById('modalModule_{{ course.id }}').classList.add('hidden');" class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
+                                </div>
+                                <form action="{% url 'management:create_module' course.id %}" method="POST" class="space-y-4">
+                                    {% csrf_token %}
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Título do Módulo</label>
+                                        <input type="text" name="title" required placeholder="Ex: Módulo 1: Teoria do Fogo" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Ordem de Exibição</label>
+                                        <input type="number" name="order" value="{{ course.modules.count|add:1 }}" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+                                    </div>
+                                    <div class="flex justify-end gap-2 pt-2">
+                                        <button type="button" onclick="document.getElementById('modalModule_{{ course.id }}').classList.add('hidden');" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                                        <button type="submit" class="btn-fire text-white text-xs font-bold px-5 py-2 rounded-xl">Salvar Módulo</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    {% empty %}
+                        <p class="text-xs text-slate-400 italic text-center py-4">Nenhum módulo criado para este curso ainda.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="bg-white p-12 rounded-3xl border border-slate-200 text-center shadow-sm">
+                <i class="bi bi-folder-plus text-4xl text-slate-300 block mb-2"></i>
+                <h3 class="text-lg font-bold text-slate-900">Nenhum curso cadastrado</h3>
+                <p class="text-slate-500 text-xs mt-1 mb-4">Clique no botão abaixo para criar o primeiro curso da plataforma.</p>
+                <button onclick="document.getElementById('modalCourse').classList.remove('hidden');" class="btn-fire text-white text-xs font-bold px-6 py-3 rounded-2xl">
+                    Criar Novo Curso
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Modal para Criar Novo Curso -->
+    <div id="modalCourse" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 class="font-extrabold text-slate-900 text-base">Cadastrar Novo Curso Oficial</h3>
+                <button onclick="document.getElementById('modalCourse').classList.add('hidden');" class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
+            </div>
+            <form action="{% url 'management:create_course' %}" method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Título do Curso</label>
+                    <input type="text" name="title" required placeholder="Ex: NR-35 Trabalho em Altura - 16h" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Descrição Completa</label>
+                    <textarea name="description" rows="3" placeholder="Resumo e objetivos do treinamento profissional..." class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modalCourse').classList.add('hidden');" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                    <button type="submit" class="btn-fire text-white text-xs font-bold px-5 py-2 rounded-xl">Criar Curso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

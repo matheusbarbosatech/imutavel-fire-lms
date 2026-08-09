@@ -29,3 +29,14 @@ class ManagementTestCase(TestCase):
         response = self.client.get('/exportar/matriculas/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/csv; charset=utf-8')
+
+    def test_course_manage_list(self):
+        self.client.login(username='admin_gestor@test.com', password='Password123')
+        response = self.client.get('/cursos/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_course(self):
+        self.client.login(username='admin_gestor@test.com', password='Password123')
+        response = self.client.post('/cursos/criar/', {'title': 'Curso Novo Teste', 'description': 'Descrição'})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Course.objects.filter(title='Curso Novo Teste').exists())

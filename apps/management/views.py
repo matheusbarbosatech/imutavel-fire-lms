@@ -269,3 +269,155 @@ def export_payments_csv_view(request):
         ])
 
     return response
+
+
+from apps.courses.models import Module, Lesson, Quiz, Question, Answer
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+
+@admin_required
+def course_manage_list_view(request):
+    """Painel de Gestão de Conteúdo: Exibe todos os cursos, módulos e aulas para edição."""
+    courses = Course.objects.all().prefetch_related('modules__lessons')
+    return render(request, 'management/course_manage_list.html', {'courses': courses})
+
+
+@admin_required
+def create_course_view(request):
+    """Cria um novo curso na plataforma."""
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        if title:
+            course = Course.objects.create(title=title, description=description, is_active=True)
+            messages.success(request, f'Curso "{course.title}" criado com sucesso!')
+            return redirect('management:course_manage_list')
+        else:
+            messages.error(request, 'O título do curso é obrigatório.')
+    return redirect('management:course_manage_list')
+
+
+@admin_required
+def create_module_view(request, course_id):
+    """Cria um novo módulo dentro de um curso."""
+    course = get_object_or_404(Course, id=course_id)
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        order = request.POST.get('order', '1')
+        try:
+            order_int = int(order)
+        except ValueError:
+            order_int = 1
+
+        if title:
+            module = Module.objects.create(course=course, title=title, order=order_int)
+            messages.success(request, f'Módulo "{module.title}" adicionado ao curso!')
+        else:
+            messages.error(request, 'O título do módulo é obrigatório.')
+    return redirect('management:course_manage_list')
+
+
+@admin_required
+def create_lesson_view(request):
+    """Formulário para cadastro de uma nova aula com vídeo, texto e anexo."""
+    if request.method == 'POST':
+        module_id = request.POST.get('module_id')
+        title = request.POST.get('title', '').strip()
+        video_url = request.POST.get('video_url', '').strip()
+        content = request.POST.get('content', '').strip()
+        order = request.POST.get('order', '1')
+        attachment = request.FILES.get('attachment')
+
+        try:
+            order_int = int(order)
+        except ValueError:
+            order_int = 1
+
+        if module_id and title:
+            module = get_object_or_404(Module, id=module_id)
+            lesson = Lesson.objects.create(
+                module=module,
+                title=title,
+                video_url=video_url,
+                content=content,
+                attachment=attachment,
+                order=order_int
+            )
+            messages.success(request, f'Aula "{lesson.title}" cadastrada com sucesso!')
+            return redirect('management:course_manage_list')
+        else:
+            messages.error(request, 'Selecione o módulo e preencha o título da aula.')
+
+    modules = Module.objects.all().select_related('course')
+    return render(request, 'management/lesson_form.html', {'modules': modules, 'lesson': None})
+
+
+@admin_required
+def edit_lesson_view(request, lesson_id):
+    """Edição de uma aula existente."""
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        video_url = request.POST.get('video_url', '').strip()
+        content = request.POST.get('content', '').strip()
+        order = request.POST.get('order', '1')
+        attachment = request.FILES.get('attachment')
+
+        try:
+            order_int = int(order)
+        except ValueError:
+            order_int = 1
+
+        if title:
+            lesson.title = title
+            lesson.video_url = video_url
+            lesson.content = content
+            lesson.order = order_int
+            if attachment:
+                lesson.attachment = attachment
+            lesson.save()
+            messages.success(request, f'Aula "{lesson.title}" atualizada com sucesso!')
+            return redirect('management:course_manage_list')
+        else:
+            messages.error(request, 'O título da aula é obrigatório.')
+
+    modules = Module.objects.all().select_related('course')
+    return render(request, 'management/lesson_form.html', {'modules': modules, 'lesson': lesson})
+
+
+@admin_required
+def create_quiz_view(request, lesson_id):
+    """Criação de avaliação (quiz) e perguntas para uma aula."""
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        min_score = request.POST.get('min_score', '70')
+        q1_text = request.POST.get('q1_text', '').strip()
+        q1_a1 = request.POST.get('q1_a1', '').strip()
+        q1_a2 = request.POST.get('q1_a2', '').strip()
+        q1_correct = request.POST.get('q1_correct', '1')
+
+        try:
+            min_score_int = int(min_score)
+        except ValueError:
+            min_score_int = 70
+
+        if title:
+            quiz, _ = Quiz.objects.get_or_create(
+                lesson=lesson,
+                defaults={'title': title, 'min_score': min_score_int}
+            )
+            quiz.title = title
+            quiz.min_score = min_score_int
+            quiz.save()
+
+            if q1_text and q1_a1 and q1_a2:
+                q1 = Question.objects.create(quiz=quiz, text=q1_text)
+                Answer.objects.create(question=q1, text=q1_a1, is_correct=(q1_correct == '1'))
+                Answer.objects.create(question=q1, text=q1_a2, is_correct=(q1_correct == '2'))
+
+            messages.success(request, f'Avaliação "{quiz.title}" cadastrada para a aula!')
+            return redirect('management:course_manage_list')
+
+    existing_quiz = Quiz.objects.filter(lesson=lesson).first()
+    return render(request, 'management/quiz_form.html', {'lesson': lesson, 'quiz': existing_quiz})

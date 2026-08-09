@@ -23,4 +23,12 @@ urlpatterns = [
     path('documentos/<int:doc_id>/<str:action>/', views.document_verify_action_view, name='document_action'),
     path('exportar/matriculas/', views.export_enrollments_csv_view, name='export_enrollments_csv'),
     path('exportar/financeiro/', views.export_payments_csv_view, name='export_payments_csv'),
+
+    # 📚 Painel de Gestão de Cursos, Aulas, Materiais e Quizzes (Front-end)
+    path('cursos/', views.course_manage_list_view, name='course_manage_list'),
+    path('cursos/criar/', views.create_course_view, name='create_course'),
+    path('cursos/<int:course_id>/modulos/criar/', views.create_module_view, name='create_module'),
+    path('aulas/criar/', views.create_lesson_view, name='create_lesson'),
+    path('aulas/<int:lesson_id>/editar/', views.edit_lesson_view, name='edit_lesson'),
+    path('aulas/<int:lesson_id>/quiz/criar/', views.create_quiz_view, name='create_quiz'),
 ]

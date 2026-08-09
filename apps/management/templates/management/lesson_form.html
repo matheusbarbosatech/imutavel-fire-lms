@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if lesson %}Editar Aula — {{ lesson.title }}{% else %}Cadastrar Nova Aula{% endif %} — IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Header da Página -->
+    <div class="flex items-center justify-between border-b border-slate-200 pb-6 mb-8">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="bi bi-camera-reorder text-red-600"></i> Editor de Aulas e Conteúdo
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+                {% if lesson %}Editar Aula: {{ lesson.title }}{% else %}Cadastrar Nova Aula{% endif %}
+            </h1>
+            <p class="text-slate-500 text-sm mt-1">Preencha o vídeo do YouTube, a apostila teórica e faça o upload de materiais anexos (PDFs, ZIPs, etc.).</p>
+        </div>
+        <a href="{% url 'management:course_manage_list' %}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow transition">
+            <i class="bi bi-arrow-left"></i> Voltar ao Painel
+        </a>
+    </div>
+
+    <!-- Form Principal -->
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-md p-8 md:p-10">
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Módulo de Destino (Apenas ao criar) -->
+            {% if not lesson %}
+            <div>
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">Módulo de Destino *</label>
+                <select name="module_id" required class="w-full p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none bg-slate-50 font-bold text-slate-800">
+                    <option value="">-- Selecione o Módulo do Curso --</option>
+                    {% for mod in modules %}
+                        <option value="{{ mod.id }}" {% if request.GET.module_id == mod.id|stringformat:"i" %}selected{% endif %}>
+                            {{ mod.course.title }} ➔ Módulo {{ mod.order }}: {{ mod.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+            <!-- Título da Aula -->
+            <div>
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">Título da Aula *</label>
+                <input type="text" name="title" required value="{{ lesson.title|default:'' }}" placeholder="Ex: Aula 1: Operação de Extintores Portáteis" class="w-full p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+            </div>
+
+            <!-- URL do Vídeo (YouTube / Vimeo) -->
+            <div>
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">
+                    <i class="bi bi-youtube text-red-600 mr-1"></i> Link do Vídeo (YouTube / Vimeo / Google Drive)
+                </label>
+                <input type="url" name="video_url" value="{{ lesson.video_url|default:'' }}" placeholder="Ex: https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="w-full p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none font-mono">
+                <p class="text-[11px] text-slate-400 mt-1">Insira o link normal do YouTube. O sistema converterá automaticamente para o player integrado em alta resolução.</p>
+            </div>
+
+            <!-- Conteúdo Teórico / Apostila -->
+            <div>
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">Conteúdo Teórico / Texto da Aula</label>
+                <textarea name="content" rows="8" placeholder="Escreva aqui o texto da aula, resumos, normas técnicas ou checklists operacionais..." class="w-full p-4 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none font-sans leading-relaxed">{{ lesson.content|default:'' }}</textarea>
+            </div>
+
+            <!-- Upload de Anexo (PDF, DOCX, ZIP) -->
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">
+                    <i class="bi bi-file-earmark-pdf-fill text-red-600 mr-1"></i> Material Anexo para Download (PDF, DOCX, ZIP, PPTX)
+                </label>
+                <input type="file" name="attachment" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer">
+                {% if lesson and lesson.attachment %}
+                    <p class="text-xs text-emerald-600 font-bold mt-2">
+                        <i class="bi bi-check-circle-fill"></i> Anexo atual: <a href="{{ lesson.attachment.url }}" target="_blank" class="underline">{{ lesson.attachment.name }}</a>
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Ordem da Aula -->
+            <div>
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">Ordem de Exibição</label>
+                <input type="number" name="order" value="{{ lesson.order|default:'1' }}" class="w-32 p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+                <a href="{% url 'management:course_manage_list' %}" class="px-6 py-3 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn-fire text-white text-xs uppercase font-extrabold tracking-wider px-8 py-3.5 rounded-2xl shadow-lg flex items-center gap-2">
+                    <i class="bi bi-check2-circle text-base"></i> {% if lesson %}Salvar Alterações{% else %}Cadastrar Aula{% endif %}
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

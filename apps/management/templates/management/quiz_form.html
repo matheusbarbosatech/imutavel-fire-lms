@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastrar Avaliação / Simulado — IMUTÁVEL FIRE{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-200 pb-6 mb-8">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="bi bi-clipboard-check-fill text-amber-500"></i> Avaliação do Aluno
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+                Simulado para a Aula: <span class="text-red-600">{{ lesson.title }}</span>
+            </h1>
+            <p class="text-slate-500 text-sm mt-1">Defina a nota de aprovação e cadastre perguntas com alternativas para a prova.</p>
+        </div>
+        <a href="{% url 'management:course_manage_list' %}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow transition">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-md p-8 md:p-10">
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">Título da Avaliação *</label>
+                <input type="text" name="title" required value="{{ quiz.title|default:'Avaliação de Conhecimento — '|add:lesson.title }}" class="w-full p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none font-bold">
+            </div>
+
+            <div>
+                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">Nota Mínima para Aprovação (%) *</label>
+                <input type="number" name="min_score" required value="{{ quiz.min_score|default:'70' }}" class="w-32 p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none font-bold">
+            </div>
+
+            <!-- Cadastro de Pergunta Inicial -->
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
+                <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                    <i class="bi bi-question-circle-fill text-red-600"></i> Pergunta nº 1 (Múltipla Escolha)
+                </h3>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Enunciado da Pergunta</label>
+                    <input type="text" name="q1_text" placeholder="Ex: Qual extintor deve ser aplicado na Classe A?" class="w-full p-3 rounded-xl border border-slate-300 text-sm outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Alternativa A</label>
+                        <input type="text" name="q1_a1" placeholder="Ex: Água Pressurizada (AP)" class="w-full p-3 rounded-xl border border-slate-300 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Alternativa B</label>
+                        <input type="text" name="q1_a2" placeholder="Ex: Gás Carbônico (CO2)" class="w-full p-3 rounded-xl border border-slate-300 text-sm outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Gabarito (Alternativa Correta)</label>
+                    <select name="q1_correct" class="w-full p-3 rounded-xl border border-slate-300 text-sm outline-none bg-white font-bold text-slate-800">
+                        <option value="1">Alternativa A é a Correta</option>
+                        <option value="2">Alternativa B é a Correta</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+                <a href="{% url 'management:course_manage_list' %}" class="px-6 py-3 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn-fire text-white text-xs uppercase font-extrabold tracking-wider px-8 py-3.5 rounded-2xl shadow-lg flex items-center gap-2">
+                    <i class="bi bi-check2-circle text-base"></i> Salvar Avaliação
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}
