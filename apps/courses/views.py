@@ -97,7 +97,7 @@ def lesson_detail_view(request, lesson_id):
         lesson = get_object_or_404(Lesson, id=lesson_id)
         module = lesson.module
         course = module.course
-        quiz = getattr(lesson, 'quiz', None)
+        quiz = Quiz.objects.filter(lesson=lesson).first()
 
         progress, _ = LessonProgress.objects.get_or_create(
             student=request.user, 
@@ -118,6 +118,7 @@ def lesson_detail_view(request, lesson_id):
     except Exception as e:
         print("❌ ERRO NO DETALHE DA AULA:")
         print(traceback.format_exc())
+        messages.error(request, f"Erro ao acessar a aula: {e}")
         return redirect('courses:student_dashboard')
 
 
