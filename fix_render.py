@@ -6,21 +6,19 @@ django.setup()
 
 from django.db import connection
 
-def force_clean():
-    print("🧹 [Render Hack] Iniciando limpeza forçada no banco de dados...")
-    with connection.cursor() as cursor:
-        try:
-            # Tenta limpar caso o banco do Render seja PostgreSQL
-            cursor.execute("TRUNCATE courses_enrollment CASCADE;")
-            print("✅ Limpeza concluída via PostgreSQL (Cascade).")
-        except Exception:
-            try:
-                # Tenta limpar caso o banco do Render seja SQLite
-                cursor.execute("DELETE FROM courses_enrollment;")
-                print("✅ Limpeza concluída via SQLite.")
-            except Exception as e:
-                print(f"⚠️ Aviso ignorado: {e}")
+print("🔥 INICIANDO LIMPEZA DE EMERGÊNCIA NO BANCO DE DADOS (RENDER)...")
 
-if __name__ == "__main__":
-    force_clean()
-    print("🚀 Pronto para rodar as migrações em paz!")
+with connection.cursor() as cursor:
+    try:
+        # PostgreSQL (Render) - Limpa tudo em cascata para não dar erro de chave estrangeira
+        cursor.execute("""
+            TRUNCATE courses_enrollment CASCADE;
+            TRUNCATE courses_module CASCADE;
+            TRUNCATE courses_lesson CASCADE;
+            TRUNCATE certificates_certificate CASCADE;
+        """)
+        print("✅ TABELAS ÓRFÃS DESTRUÍDAS COM SUCESSO (POSTGRESQL)!")
+    except Exception as e:
+        print(f"⚠️ Erro no truncate (Pode ser SQLite): {e}")
+
+print("🚀 Limpeza concluída, liberando caminho para a migração!")
