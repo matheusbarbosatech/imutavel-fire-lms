@@ -6,7 +6,8 @@ from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+from reportlab.lib.enums import TA_CENTER
+
 
 def generate_certificate_pdf(certificate, base_url="http://127.0.0.1:8000"):
     """Gera o Certificado Oficial em PDF Vetorial de Alta Resolução com Selo Digital e QR Code."""
@@ -14,11 +15,11 @@ def generate_certificate_pdf(certificate, base_url="http://127.0.0.1:8000"):
     # 1. Cria o diretório de destino
     cert_dir = os.path.join(settings.MEDIA_ROOT, 'certificates')
     os.makedirs(cert_dir, exist_ok=True)
-    pdf_filename = f"certificate_{certificate.auth_code}.pdf"
+    pdf_filename = f"certificate_{certificate.code}.pdf"
     pdf_filepath = os.path.join(cert_dir, pdf_filename)
 
     # 2. Gera o QR Code
-    validation_url = f"{base_url}/certificates/validar/{certificate.auth_code}/"
+    validation_url = f"{base_url}/certificates/validar/{certificate.code}/"
     qr = qrcode.QRCode(version=1, box_size=4, border=1)
     qr.add_data(validation_url)
     qr.make(fit=True)
@@ -46,16 +47,6 @@ def generate_certificate_pdf(certificate, base_url="http://127.0.0.1:8000"):
         alignment=TA_CENTER,
         fontName='Helvetica-Bold'
     )
-    
-    body_style = ParagraphStyle(
-        'CertBody',
-        parent=styles['Normal'],
-        fontSize=12,
-        leading=18,
-        textColor=colors.HexColor('#212529'),
-        alignment=TA_CENTER,
-        fontName='Helvetica'
-    )
 
     small_style = ParagraphStyle(
         'CertSmall',
@@ -67,26 +58,34 @@ def generate_certificate_pdf(certificate, base_url="http://127.0.0.1:8000"):
         fontName='Helvetica'
     )
 
+    body_style = ParagraphStyle(
+        'CertBody',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=18,
+        textColor=colors.HexColor('#212529'),
+        alignment=TA_CENTER,
+        fontName='Helvetica'
+    )
+
     elements = []
 
     # Borda / Moldura Dupla
-    elements.append(Paragraph("<b>REPUBLICA FEDERATIVA DO BRASIL — REGISTRO TECNICO</b>", small_style))
+    elements.append(Paragraph("<b>REPÚBLICA FEDERATIVA DO BRASIL — REGISTRO TÉCNICO</b>", small_style))
     elements.append(Spacer(1, 10))
     elements.append(Paragraph("<b>CERTIFICADO DE CAPACITAÇÃO PROFISSIONAL</b>", title_style))
     elements.append(Spacer(1, 15))
 
     student_name = certificate.student.get_full_name() or certificate.student.username
-    cpf_masked = certificate.student.cpf or "---"
-    cbmerj = certificate.student.cbmerj_registration or "N/A"
+    cpf_masked = getattr(certificate.student, 'cpf', '---') or "---"
+    cbmerj = getattr(certificate.student, 'cbmerj_registration', 'N/A') or "N/A"
     course_title = certificate.course.title
-    hours = certificate.course.workload_hours
     issue_date = certificate.issued_at.strftime('%d/%m/%Y')
-    expire_date = certificate.expires_at.strftime('%d/%m/%Y') if certificate.expires_at else "VALIDADE INDETERMINADA"
 
     text = f"""
     Certificamos que <b>{student_name.upper()}</b>, portador(a) do CPF sob nº <b>{cpf_masked}</b> 
     e Registro Profissional/CBMERJ <b>{cbmerj}</b>, concluiu com êxito o treinamento de qualificação profissional em 
-    <b>{course_title.upper()}</b>, com carga horária total de <b>{hours} horas</b>, 
+    <b>{course_title.upper()}</b>, 
     cumprindo rigorosamente todas as exigências teóricas, práticas e avaliativas estabelecidas.
     """
     
@@ -97,9 +96,9 @@ def generate_certificate_pdf(certificate, base_url="http://127.0.0.1:8000"):
     qr_reportlab_img = Image(qr_bytes, width=70, height=70)
     
     meta_text = f"""
-    <b>Código de Autenticidade:</b> {certificate.auth_code}<br/>
-    <b>Data de Emissão:</b> {issue_date} | <b>Reciclagem/Validade:</b> {expire_date}<br/>
-    <b>Assinatura Criptográfica PGP/ICP-Brasil:</b> {certificate.auth_code.lower()}998877665544332211<br/>
+    <b>Código de Autenticidade:</b> {certificate.code}<br/>
+    <b>Data de Emissão:</b> {issue_date} | <b>Validade:</b> INDETERMINADA<br/>
+    <b>Assinatura Criptográfica:</b> {certificate.code.lower()}998877665544332211<br/>
     <font color="#DC3545"><b>Documento Assinado Digitalmente — Verificação em {validation_url}</b></font>
     """
     
@@ -118,6 +117,6 @@ def generate_certificate_pdf(certificate, base_url="http://127.0.0.1:8000"):
 
     doc.build(elements)
     
-    certificate.pdf_file_path = f"certificates/{pdf_filename}"
-    certificate.save(update_fields=['pdf_file_path'])
-    return certificate.pdf_file_path
+    certificate.pdf_file = f"certificates/{pdf_filename}"
+    certificate.save(update_fields=['pdf_file'])
+    return certificate.pdf_file.name

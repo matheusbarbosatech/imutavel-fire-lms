@@ -55,6 +55,7 @@ class QuestionInline(admin.TabularInline):
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
     list_display = ('title', 'lesson', 'min_score')
+    list_filter = ('lesson__module__course',)
     search_fields = ('title',)
     inlines = [QuestionInline]
 
@@ -62,5 +63,6 @@ class QuizAdmin(admin.ModelAdmin):
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('text', 'quiz')
+    list_filter = ('quiz',)
     search_fields = ('text',)
     inlines = [AnswerInline]

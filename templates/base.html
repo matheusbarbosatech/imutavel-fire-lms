@@ -14,6 +14,7 @@
                     colors: {
                         'fire-red': '#D32F2F',
                         'fire-dark': '#9A0007',
+                        'brand-dark': '#0F172A',
                     }
                 }
             }
@@ -22,17 +23,19 @@
 
     <!-- FontAwesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col font-sans text-gray-800">
+<body class="bg-gray-50 min-h-screen flex flex-col font-sans text-gray-800 antialiased">
 
     <!-- Cabeçalho / Navbar -->
-    <nav class="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
+    <nav class="bg-slate-900 text-white shadow-md sticky top-0 z-50 border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="{% url 'courses:dashboard' %}" class="text-xl font-extrabold tracking-wide text-fire-red flex items-center gap-2 hover:opacity-90 transition">
+                    <a href="{% url 'courses:student_dashboard' %}" class="text-xl font-extrabold tracking-wide text-fire-red flex items-center gap-2.5 hover:opacity-90 transition">
                         <i class="fa-solid fa-fire text-2xl text-fire-red"></i> 
                         <span class="text-white">IMUTÁVEL</span> <span class="text-fire-red">FIRE</span>
                     </a>
@@ -42,21 +45,21 @@
                 <div class="flex items-center gap-4">
                     {% if user.is_authenticated %}
                         <!-- Nome do Usuário -->
-                        <div class="hidden sm:flex items-center gap-2 text-sm text-gray-300">
-                            <i class="fa-solid fa-circle-user text-gray-400 text-lg"></i>
-                            <span>{{ user.first_name|default:user.username }}</span>
+                        <div class="hidden sm:flex items-center gap-2 text-sm text-gray-300 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                            <i class="fa-solid fa-user-circle text-fire-red text-base"></i>
+                            <span class="font-medium">{{ user.first_name|default:user.username }}</span>
                         </div>
 
                         <!-- Botão Admin (Apenas Superusuários) -->
                         {% if user.is_superuser %}
-                            <a href="/admin/" class="bg-red-700 hover:bg-red-800 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow flex items-center gap-1">
+                            <a href="/admin/" class="bg-fire-red hover:bg-red-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow flex items-center gap-1.5">
                                 <i class="fa-solid fa-shield-halved"></i>
                                 <span class="hidden md:inline">Painel Admin</span>
                             </a>
                         {% endif %}
 
                         <!-- Botão de Sair (Logout) -->
-                        <a href="{% url 'accounts:logout' %}" class="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 border border-gray-700">
+                        <a href="{% url 'accounts:logout' %}" class="bg-slate-800 hover:bg-slate-700 text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 border border-slate-700">
                             <i class="fa-solid fa-right-from-bracket"></i>
                             <span class="hidden sm:inline">Sair</span>
                         </a>
@@ -76,8 +79,11 @@
     {% if messages %}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
             {% for message in messages %}
-                <div class="p-4 rounded-xl text-sm font-semibold shadow-sm mb-2 flex items-center justify-between {% if message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% else %}bg-green-100 text-green-800 border border-green-200{% endif %}">
-                    <span>{{ message }}</span>
+                <div class="p-4 rounded-xl text-sm font-semibold shadow-sm mb-2 flex items-center justify-between {% if message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-emerald-50 text-emerald-800 border border-emerald-200{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid {% if message.tags == 'error' %}fa-triangle-exclamation text-red-600{% else %}fa-circle-check text-emerald-600{% endif %}"></i>
+                        <span>{{ message }}</span>
+                    </div>
                     <button onclick="this.parentElement.remove();" class="text-xs font-bold px-2 py-1 opacity-70 hover:opacity-100">&times;</button>
                 </div>
             {% endfor %}
@@ -91,11 +97,16 @@
     </main>
 
     <!-- Rodapé -->
-    <footer class="bg-gray-900 text-gray-400 py-6 text-center text-sm border-t border-gray-800 mt-12">
-        <div class="max-w-7xl mx-auto px-4">
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-white font-bold">
+                <i class="fa-solid fa-fire text-fire-red"></i>
+                <span>IMUTÁVEL FIRE LMS</span>
+            </div>
             <p>&copy; {% now "Y" %} Imutável Fire Treinamentos. Todos os direitos reservados.</p>
         </div>
     </footer>
 
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
