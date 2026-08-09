@@ -328,6 +328,29 @@ def run_populate():
 
     print(f"✅ Habilitadas {count_enrollments} matrículas de alunos com sucesso!")
 
+    print("\n📜 [4/5] Gerando Certificados Oficiais e Credenciais PVC de Exemplo...")
+    from apps.certificates.utils import issue_certificate_for_user
+
+    count_certs = 0
+    for user in users:
+        # Preenche dados operacionais do perfil do aluno para a carteirinha PVC
+        if not getattr(user, 'cpf', None):
+            user.cpf = "123.456.789-00"
+        if not getattr(user, 'cbmerj_registration', None):
+            user.cbmerj_registration = "BC-2026/RJ-00982"
+        if not getattr(user, 'blood_type', None):
+            user.blood_type = "O+"
+        user.save()
+
+        # Emite certificados de exemplo para Bombeiro Civil e NR-35
+        issue_certificate_for_user(user, course_bc)
+        issue_certificate_for_user(user, course_nr35)
+        count_certs += 2
+
+    print(f"✅ Emitidos {count_certs} certificados e credenciais PVC de teste!")
+
+    from apps.certificates.models import Certificate
+
     print("\n🎉 [5/5] BANCO DE DADOS ALIMENTADO E POVOADO COM SUCESSO!")
     print(f"📊 Resumo dos Conteúdo:")
     print(f"   • Cursos Ativos: {Course.objects.count()}")
@@ -335,6 +358,7 @@ def run_populate():
     print(f"   • Aulas Criadas: {Lesson.objects.count()}")
     print(f"   • Quizzes Criados: {Quiz.objects.count()}")
     print(f"   • Perguntas de Avaliação: {Question.objects.count()}")
+    print(f"   • Certificados & Carteirinhas PVC Emitidos: {Certificate.objects.count()}")
 
 
 if __name__ == "__main__":
