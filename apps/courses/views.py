@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Course, Module, Lesson, Enrollment, LessonProgress, LessonComment
+from .models import Course, Module, Lesson, Enrollment, LessonProgress, LessonComment, Quiz
 from apps.certificates.utils import issue_certificate_for_user
 import traceback
 
