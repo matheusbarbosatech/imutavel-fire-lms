@@ -4,6 +4,5 @@ from . import views
 app_name = 'quizzes'
 
 urlpatterns = [
-    # Rota principal para realizar o simulado e exibir o gabarito/resultado
-    path('simulado/<int:quiz_id>/', views.take_quiz, name='take_quiz'),
+    path('<int:quiz_id>/', views.take_quiz_view, name='take_quiz'),
 ]
