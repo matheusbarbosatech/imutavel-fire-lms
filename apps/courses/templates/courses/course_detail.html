@@ -1,82 +1,50 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ course.title }} - IMUTÁVEL FIRE{% endblock %}
-
 {% block content %}
-<div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <div>
-        <a href="{% url 'courses:student_dashboard' %}" class="btn btn-outline-secondary btn-sm mb-2">
-            <i class="bi bi-arrow-left"></i> Voltar ao Painel
+<div class="max-w-5xl mx-auto px-4 py-8">
+    <div class="mb-6">
+        <a href="{% url 'courses:dashboard' %}" class="text-fire-red hover:underline font-semibold">
+            &larr; Voltar para Meus Cursos
         </a>
-        <h2 class="fw-bold mb-1">{{ course.title }}</h2>
-        <p class="text-muted mb-0">{{ course.description }}</p>
     </div>
 
-    <!-- Botão de Emissão de Certificado de Destaque Topo -->
-    <a href="{% url 'certificates:emit_certificate' course.slug %}" class="btn btn-success btn-lg shadow-sm font-weight-bold">
-        <i class="bi bi-award-fill me-2"></i> Emitir Certificado
-    </a>
-</div>
+    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-2">{{ course.title }}</h1>
+        <p class="text-gray-600">{{ course.description }}</p>
+    </div>
 
-<div class="accordion mb-4" id="accordionModules">
-    {% for module in modules %}
-        <div class="accordion-item mb-3 border rounded shadow-sm">
-            <h2 class="accordion-header" id="heading{{ module.id }}">
-                <button class="accordion-button fw-bold fs-6" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ module.id }}" aria-expanded="true">
-                    Módulo {{ module.order }}: {{ module.title }}
-                </button>
-            </h2>
-            <div id="collapse{{ module.id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionModules">
-                <div class="accordion-body p-0">
-                    <ul class="list-group list-group-flush">
-                        {% for lesson in module.lessons.all %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                                <div>
-                                    {% if lesson.id in completed_lesson_ids %}
-                                        <i class="bi bi-check-circle-fill text-success fs-5 me-2"></i>
-                                    {% else %}
-                                        <i class="bi bi-circle text-muted fs-5 me-2"></i>
-                                    {% endif %}
-                                    <span class="fw-semibold">{{ lesson.title }}</span>
-                                    <span class="badge bg-secondary ms-2">{{ lesson.get_content_type_display }}</span>
-                                </div>
-                                <a href="{% url 'courses:lesson_view' lesson.id %}" class="btn btn-primary btn-sm px-3">
-                                    <i class="bi bi-play-circle me-1"></i> Acessar Aula
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Módulos do Curso</h2>
+
+    {% if modules %}
+        <div class="space-y-6">
+            {% for module in modules %}
+            <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800">{{ module.title }}</h3>
+                </div>
+                <div class="p-6">
+                    {% if module.lessons.all %}
+                        <ul class="divide-y divide-gray-100">
+                            {% for lesson in module.lessons.all %}
+                            <li class="py-3 flex items-center justify-between">
+                                <span class="font-medium text-gray-700">{{ lesson.title }}</span>
+                                <a href="{% url 'courses:lesson_detail' lesson.id %}" class="bg-fire-red hover:bg-red-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+                                    Assistir Aula
                                 </a>
                             </li>
-                        {% empty %}
-                            <li class="list-group-item text-muted p-3">Nenhuma aula cadastrada neste módulo.</li>
-                        {% endfor %}
-                    </ul>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-sm text-gray-500">Nenhuma aula cadastrada neste módulo ainda.</p>
+                    {% endif %}
                 </div>
             </div>
+            {% endfor %}
         </div>
-    {% empty %}
-        <div class="alert alert-warning p-4">
-            <i class="bi bi-exclamation-triangle me-2"></i> Nenhum módulo encontrado para este curso.
+    {% else %}
+        <div class="p-6 bg-yellow-50 text-yellow-800 rounded-xl">
+            Nenhum módulo encontrado para este curso.
         </div>
-    {% endfor %}
+    {% endif %}
 </div>
-
-<!-- Card do Simulado Final -->
-{% if course.quizzes.exists %}
-    <div class="card bg-light border-danger shadow-sm">
-        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h5 class="fw-bold mb-1 text-danger"><i class="bi bi-file-earmark-text me-2"></i>Simulado de Avaliação Final</h5>
-                <p class="text-muted small mb-0">Responda às questões obrigatórias para ter acesso à emissão do certificado.</p>
-            </div>
-            <div class="d-flex gap-2">
-                {% for quiz in course.quizzes.all %}
-                    <a href="{% url 'quizzes:take_quiz' quiz.id %}" class="btn btn-danger font-weight-bold">
-                        <i class="bi bi-pencil-square me-1"></i> Realizar Prova / Simulado
-                    </a>
-                {% endfor %}
-                <a href="{% url 'certificates:emit_certificate' course.slug %}" class="btn btn-success font-weight-bold">
-                    <i class="bi bi-award-fill me-1"></i> Emitir Certificado
-                </a>
-            </div>
-        </div>
-    </div>
-{% endif %}
 {% endblock %}
