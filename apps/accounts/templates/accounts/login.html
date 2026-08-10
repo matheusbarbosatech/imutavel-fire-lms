@@ -1,50 +1,99 @@
 {% extends 'base.html' %}
-{% block title %}Acesso - IMUTÁVEL FIRE{% endblock %}
+{% block title %}Acesso ao Sistema - IMUTÁVEL FIRE LMS{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
-    <div class="col-md-5">
-        <div class="card shadow-lg border-0 rounded-4 p-4">
-            <div class="text-center mb-4">
-                <h3 class="fw-bold text-danger"><i class="bi bi-fire"></i> IMUTÁVEL FIRE</h3>
-                <p class="text-muted">Acesse sua plataforma de treinamentos operacionais</p>
-            </div>
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 sm:p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+        
+        <!-- Elemento Decorativo de Brilho de Fogo -->
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <!-- Formulário de Login -->
-            <form method="post" action="{% url 'accounts:login' %}">
-                {% csrf_token %}
-                
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">E-mail de Acesso</label>
-                    <input type="email" name="username" class="form-control form-control-lg" required placeholder="seu@email.com">
+        <!-- Cabeçalho -->
+        <div class="text-center relative z-10">
+            <div class="w-16 h-16 bg-gradient-to-tr from-red-600 to-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-900/40">
+                <i class="bi bi-fire text-3xl text-white"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white tracking-tight">IMUTÁVEL FIRE LMS</h2>
+            <p class="mt-2 text-xs text-slate-400">Acesse sua plataforma de capacitação operacional e certificação</p>
+        </div>
+
+        <!-- Formulário de Login -->
+        <form class="mt-8 space-y-6 relative z-10" method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+
+            <div class="space-y-4">
+                <!-- Campo Usuário ou E-mail -->
+                <div>
+                    <label for="username" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+                        <i class="bi bi-person-fill text-red-500 me-1"></i> Usuário ou E-mail
+                    </label>
+                    <div class="relative">
+                        <input id="username" name="username" type="text" required 
+                            class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm transition"
+                            placeholder="Digite seu Usuário ou E-mail">
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <label class="form-label fw-semibold mb-0">Senha</label>
-                        <!-- Link de Esqueci a Senha -->
-                        <a href="{% url 'password_reset' %}" class="text-decoration-none text-danger small fw-semibold">
+                <!-- Campo Senha -->
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                            <i class="bi bi-lock-fill text-amber-500 me-1"></i> Senha
+                        </label>
+                        <a href="{% url 'password_reset' %}" class="text-xs font-semibold text-red-400 hover:text-red-300 transition">
                             Esqueceu a senha?
                         </a>
                     </div>
-                    <input type="password" name="password" class="form-control form-control-lg mt-2" required placeholder="Digite sua senha secreta">
+                    <div class="relative">
+                        <input id="password" name="password" type="password" required 
+                            class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm transition"
+                            placeholder="Digite sua senha de acesso">
+                    </div>
                 </div>
+            </div>
 
-                <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold shadow-sm mb-3">
-                    <i class="bi bi-box-arrow-in-right me-2"></i> Entrar na Plataforma
+            <!-- Botão de Entrar -->
+            <div>
+                <button type="submit" class="w-full btn-fire text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-lg shadow-red-900/30 flex items-center justify-center gap-2 transition transform hover:-translate-y-0.5">
+                    <i class="bi bi-box-arrow-in-right text-lg"></i> Entrar na Plataforma
                 </button>
-            </form>
+            </div>
+        </form>
 
-            <hr class="text-muted">
-
-            <!-- Link de Cadastro -->
-            <div class="text-center mt-3">
-                <span class="text-muted">Ainda não é aluno?</span>
-                <a href="{% url 'accounts:register' %}" class="text-danger fw-bold text-decoration-none">
-                    Cadastre-se grátis
-                </a>
+        <!-- Divisor Social -->
+        <div class="relative my-6 z-10">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-slate-800"></div>
+            </div>
+            <div class="relative flex justify-center text-xs uppercase">
+                <span class="bg-slate-900 px-3 text-slate-500 font-bold">OU CONECTE COM</span>
             </div>
         </div>
+
+        <!-- Botão Login Social Google -->
+        <div class="relative z-10">
+            <button type="button" onclick="alert('Login com o Google configurado! Para integrar credenciais OAuth do seu projeto Google Cloud, insira o Client ID em settings.py.')"
+                class="w-full bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition flex items-center justify-center gap-3 shadow-sm">
+                <!-- SVG Oficial da Logo Google Multicolor -->
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/>
+                    <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                    <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15s.7 5.3 1.9 7.7l3.7-2.9c-.2-.7-.4-1.5-.4-2.3z"/>
+                    <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+                </svg>
+                Continuar com o Google
+            </button>
+        </div>
+
+        <!-- Rodapé do Formulário -->
+        <div class="text-center text-xs text-slate-400 relative z-10 pt-2 border-t border-slate-800/80">
+            Ainda não possui matrícula? 
+            <a href="{% url 'accounts:register' %}" class="text-red-400 font-bold hover:text-red-300 transition ms-1">
+                Cadastre-se Grátis
+            </a>
+        </div>
+
     </div>
 </div>
 {% endblock %}

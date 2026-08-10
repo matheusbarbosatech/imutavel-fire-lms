@@ -5,21 +5,24 @@ from django.contrib import messages
 from .models import CustomUser
 
 def login_view(request):
-    """Página de Login dos usuários/alunos."""
+    """Página de Login dos usuários/alunos com suporte a Usuário ou E-mail."""
     if request.user.is_authenticated:
         return redirect('courses:student_dashboard')
         
     if request.method == 'POST':
-        email_digitado = request.POST.get('username') 
-        senha_digitada = request.POST.get('password')
+        login_input = request.POST.get('username', '').strip()
+        senha_digitada = request.POST.get('password', '')
         
-        user = authenticate(request, username=email_digitado, password=senha_digitada)
+        user_obj = CustomUser.objects.filter(username__iexact=login_input).first() or CustomUser.objects.filter(email__iexact=login_input).first()
+        target_username = user_obj.username if user_obj else login_input
+        
+        user = authenticate(request, username=target_username, password=senha_digitada)
         
         if user is not None:
             login(request, user)
             return redirect('courses:student_dashboard')
         else:
-            messages.error(request, 'E-mail ou senha incorretos. Verifique seus dados e tente novamente.')
+            messages.error(request, 'Usuário/E-mail ou senha incorretos. Verifique seus dados e tente novamente.')
             
     return render(request, 'accounts/login.html')
 
