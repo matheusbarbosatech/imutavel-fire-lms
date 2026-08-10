@@ -1204,7 +1204,49 @@ def main(page: ft.Page):
                 margin=margin.only(top=16)
             )
 
+        # Calcular Aula Anterior e Próxima Aula no módulo do SQLite
+        cursor.execute("SELECT id FROM lessons WHERE module_id = ? ORDER BY order_num ASC, id ASC", (lesson['module_id'],))
+        mod_lessons = [r['id'] for r in cursor.fetchall()]
+        prev_lesson_id = None
+        next_lesson_id = None
+        if lesson_id in mod_lessons:
+            idx = mod_lessons.index(lesson_id)
+            if idx > 0:
+                prev_lesson_id = mod_lessons[idx - 1]
+            if idx < len(mod_lessons) - 1:
+                next_lesson_id = mod_lessons[idx + 1]
+
+        nav_buttons = []
+        if prev_lesson_id:
+            nav_buttons.append(
+                ElevatedButton(
+                    content=ft.Row([
+                        ft.Icon(icons.CHEVRON_LEFT, color=colors.WHITE, size=16),
+                        ft.Text("Aula Anterior", color=colors.WHITE, size=11, weight=ft.FontWeight.BOLD)
+                    ]),
+                    style=ft.ButtonStyle(bgcolor=colors.SLATE_700, shape=ft.RoundedRectangleBorder(radius=8)),
+                    on_click=lambda _, lid=prev_lesson_id: render_lesson_view(lid)
+                )
+            )
+        if next_lesson_id:
+            nav_buttons.append(
+                ElevatedButton(
+                    content=ft.Row([
+                        ft.Text("Próxima Aula", color=colors.WHITE, size=11, weight=ft.FontWeight.BOLD),
+                        ft.Icon(icons.CHEVRON_RIGHT, color=colors.WHITE, size=16)
+                    ]),
+                    style=ft.ButtonStyle(bgcolor=colors.RED_600, shape=ft.RoundedRectangleBorder(radius=8)),
+                    on_click=lambda _, lid=next_lesson_id: render_lesson_view(lid)
+                )
+            )
+
+        lesson_nav_container = ft.Container(
+            content=ft.Row(nav_buttons, alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+            margin=margin.symmetric(horizontal=16, vertical=4)
+        ) if nav_buttons else ft.Container()
+
         view_content = [
+            lesson_nav_container,
             ft.Container(
                 content=ft.Column([
                     ft.Row([
@@ -1247,7 +1289,8 @@ def main(page: ft.Page):
             ft.Container(
                 content=quiz_section,
                 margin=margin.symmetric(horizontal=16)
-            ) if quiz else ft.Container()
+            ) if quiz else ft.Container(),
+            lesson_nav_container
         ]
 
         conn.close()

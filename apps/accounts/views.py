@@ -7,6 +7,8 @@ from .models import CustomUser
 def login_view(request):
     """Página de Login dos usuários/alunos com suporte a Usuário ou E-mail."""
     if request.user.is_authenticated:
+        if request.user.is_superuser or request.user.is_staff or getattr(request.user, 'role', '') == 'ADMIN':
+            return redirect('management:dashboard')
         return redirect('courses:student_dashboard')
         
     if request.method == 'POST':
@@ -20,6 +22,9 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
+            messages.success(request, f'Bem-vindo(a), {user.get_full_name() or user.username}!')
+            if user.is_superuser or user.is_staff or getattr(user, 'role', '') == 'ADMIN':
+                return redirect('management:dashboard')
             return redirect('courses:student_dashboard')
         else:
             messages.error(request, 'Usuário/E-mail ou senha incorretos. Verifique seus dados e tente novamente.')

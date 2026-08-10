@@ -106,6 +106,19 @@ def lesson_detail_view(request, lesson_id):
 
         comments = lesson.comments.select_related('user').all()
 
+        # Obter todas as aulas do curso em ordem cronológica para determinar Aula Anterior e Próxima Aula
+        all_lessons = list(Lesson.objects.filter(module__course=course).order_by('module__order', 'order', 'id'))
+        prev_lesson = None
+        next_lesson = None
+
+        for idx, l in enumerate(all_lessons):
+            if l.id == lesson.id:
+                if idx > 0:
+                    prev_lesson = all_lessons[idx - 1]
+                if idx < len(all_lessons) - 1:
+                    next_lesson = all_lessons[idx + 1]
+                break
+
         context = {
             'lesson': lesson,
             'module': module,
@@ -113,6 +126,8 @@ def lesson_detail_view(request, lesson_id):
             'quiz': quiz,
             'is_completed': progress.completed,
             'comments': comments,
+            'prev_lesson': prev_lesson,
+            'next_lesson': next_lesson,
         }
         return render(request, 'courses/lesson_detail.html', context)
     except Exception as e:

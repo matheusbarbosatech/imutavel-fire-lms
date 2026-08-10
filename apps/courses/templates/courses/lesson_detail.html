@@ -6,11 +6,26 @@
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <!-- Navegação / Voltar -->
-    <div class="mb-8 flex items-center justify-between">
-        <a href="{% url 'courses:course_detail' course.id %}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-red-600 transition bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm">
-            <i class="fa-solid fa-arrow-left"></i>
-            <span>Voltar para Módulos</span>
-        </a>
+    <div class="mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'courses:course_detail' course.id %}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-red-600 transition bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Voltar para Módulos</span>
+            </a>
+
+            {% if prev_lesson %}
+                <a href="{% url 'courses:lesson_detail' prev_lesson.id %}" class="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-red-600 transition bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-2xl border border-slate-200">
+                    <i class="fa-solid fa-chevron-left"></i> Aula Anterior
+                </a>
+            {% endif %}
+
+            {% if next_lesson %}
+                <a href="{% url 'courses:lesson_detail' next_lesson.id %}" class="inline-flex items-center gap-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition px-3.5 py-2 rounded-2xl shadow-sm">
+                    Próxima Aula <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+
         <span class="bg-red-50 text-red-700 border border-red-200 text-xs font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider">
             <i class="bi bi-folder-fill mr-1"></i> {{ module.title }}
         </span>
@@ -103,6 +118,25 @@
                         </button>
                     {% endif %}
                 </form>
+            </div>
+
+            <!-- Navegação entre Aulas (Aula Anterior / Próxima Aula) -->
+            <div class="pt-4 border-t border-slate-200 flex items-center justify-between flex-wrap gap-4">
+                {% if prev_lesson %}
+                    <a href="{% url 'courses:lesson_detail' prev_lesson.id %}" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-5 py-3 rounded-2xl text-xs flex items-center gap-2 border border-slate-200 transition">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span><strong>Aula Anterior:</strong> {{ prev_lesson.title|truncatechars:30 }}</span>
+                    </a>
+                {% else %}
+                    <div></div>
+                {% endif %}
+
+                {% if next_lesson %}
+                    <a href="{% url 'courses:lesson_detail' next_lesson.id %}" class="btn-fire text-white font-bold px-5 py-3 rounded-2xl text-xs flex items-center gap-2 shadow-md transition ml-auto">
+                        <span><strong>Próxima Aula:</strong> {{ next_lesson.title|truncatechars:30 }}</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                {% endif %}
             </div>
 
             <!-- Quiz / Avaliação -->
