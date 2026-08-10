@@ -1,7 +1,7 @@
 from django.http import JsonResponse, FileResponse, HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model, authenticate
 from django.conf import settings
 from .models import Course, Module, Lesson, LessonProgress, LessonComment, Enrollment, Quiz, Question, Answer
