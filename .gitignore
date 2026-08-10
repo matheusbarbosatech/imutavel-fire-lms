@@ -3,4 +3,6 @@ venv/
 .env
 __pycache__/
 staticfiles/
-media/
+media/*
+!media/apk/
+!media/apk/*.apk
