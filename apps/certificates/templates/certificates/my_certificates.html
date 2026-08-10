@@ -11,8 +11,8 @@
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold uppercase tracking-wider mb-2">
                 <i class="bi bi-patch-check-fill text-amber-500"></i> Registro de Documentos Oficiais
             </div>
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Meus Certificados & Credenciais PVC</h1>
-            <p class="text-slate-500 text-sm mt-1">Consulte seus certificados de capacitação e faça o download da sua Credencial Operacional em PVC.</p>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Meus Certificados & Carteirinhas</h1>
+            <p class="text-slate-500 text-sm mt-1">Consulte seus certificados de capacitação e faça o download da sua Carteirinha Operacional.</p>
         </div>
         <a href="{% url 'courses:student_dashboard' %}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow transition">
             <i class="bi bi-arrow-left"></i> Voltar para Meus Cursos
@@ -23,7 +23,7 @@
         {% for cert in certificates %}
             <div class="bg-white rounded-3xl border border-slate-200/90 shadow-md overflow-hidden card-hover-lift flex flex-col">
                 
-                <!-- Mockup Visual de Cartão PVC (Frente) -->
+                <!-- Mockup Visual da Carteirinha (Frente) -->
                 <div class="gradient-dark-banner p-6 text-white relative overflow-hidden border-b border-slate-700/60">
                     <div class="absolute -right-6 -top-6 w-32 h-32 bg-red-600/20 rounded-full blur-2xl pointer-events-none"></div>
                     
@@ -33,7 +33,7 @@
                             <span class="text-xs font-extrabold tracking-widest text-slate-200 uppercase">CREDENCIAL OPERACIONAL</span>
                         </div>
                         <span class="px-2.5 py-0.5 rounded-full bg-red-600/30 border border-red-500/40 text-red-300 text-[10px] font-bold tracking-wider uppercase">
-                            PVC NBR 14608
+                            NBR 14608
                         </span>
                     </div>
 
@@ -82,7 +82,7 @@
                             <i class="bi bi-file-earmark-pdf-fill text-base"></i> Baixar Certificado Oficial (PDF)
                         </a>
                         <a href="{% url 'certificates:download_pvc_card' cert.id %}" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-2xl text-xs uppercase tracking-wider block text-center border border-slate-700 shadow-sm flex items-center justify-center gap-2 transition">
-                            <i class="bi bi-credit-card-2-front-fill text-base text-red-500"></i> Baixar Credencial PVC Operacional
+                            <i class="bi bi-credit-card-2-front-fill text-base text-red-500"></i> Baixar Carteirinha Operacional
                         </a>
                     </div>
                 </div>
@@ -101,7 +101,7 @@
                         <i class="bi bi-award"></i>
                     </div>
                     <h3 class="text-xl font-bold text-slate-900">Nenhum certificado emitido ainda</h3>
-                    <p class="text-slate-500 text-sm mt-2 max-w-md mx-auto">Conclua 100% das aulas teóricas e práticas do seu treinamento para liberar o download do seu Certificado Oficial e da Credencial PVC.</p>
+                    <p class="text-slate-500 text-sm mt-2 max-w-md mx-auto">Conclua 100% das aulas teóricas e práticas do seu treinamento para liberar o download do seu Certificado Oficial e da Carteirinha.</p>
                     <div class="mt-6">
                         <a href="{% url 'courses:student_dashboard' %}" class="btn-fire text-white text-sm font-bold px-6 py-3 rounded-2xl inline-flex items-center gap-2">
                             <i class="bi bi-journal-bookmark me-1"></i> Ir para Meus Cursos

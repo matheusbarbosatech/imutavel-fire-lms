@@ -5,7 +5,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <!-- Hero Banner de Boas-Vindas -->
-    <div class="gradient-dark-banner rounded-3xl p-8 md:p-10 text-white shadow-xl mb-12 relative overflow-hidden border border-slate-700/50">
+    <div class="gradient-dark-banner rounded-3xl p-8 md:p-10 text-white shadow-xl mb-8 relative overflow-hidden border border-slate-700/50">
         <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div class="space-y-3">
@@ -16,13 +16,13 @@
                     Bem-vindo(a), <span class="gradient-fire-text">{{ user.first_name|default:user.username }}</span>! 👋
                 </h1>
                 <p class="text-slate-300 text-base max-w-2xl leading-relaxed">
-                    Acesse suas aulas, acompanhe o progresso de capacitação profissional e gerencie sua Credencial Operacional em PVC.
+                    Acesse suas aulas, acompanhe o progresso de capacitação profissional e gerencie sua Carteirinha Operacional.
                 </p>
             </div>
             
-            <div class="flex items-center gap-4 flex-wrap">
-                <a href="{% url 'certificates:my_certificates' %}" class="btn-fire text-white text-sm font-bold px-6 py-3.5 rounded-2xl flex items-center gap-2 shadow-lg shadow-red-900/30">
-                    <i class="bi bi-award-fill text-lg text-amber-300"></i> Meus Certificados & PVC
+            <div class="flex items-center gap-3">
+                <a href="{% url 'certificates:my_certificates' %}" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs tracking-wide transition shadow-sm flex items-center gap-2">
+                    <i class="bi bi-award-fill text-lg text-amber-300"></i> Meus Certificados & Carteirinha
                 </a>
                 {% if user.is_superuser or user.is_staff or user.role == 'ADMIN' %}
                 <a href="{% url 'management:dashboard' %}" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bold px-5 py-3.5 rounded-2xl border border-slate-700 transition flex items-center gap-2">
@@ -30,6 +30,31 @@
                 </a>
                 {% endif %}
             </div>
+        </div>
+    </div>
+
+    <!-- Card Destaque: Download do Aplicativo Android Offline -->
+    <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-lg mb-10 border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+        <div class="absolute -right-6 -top-6 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="flex items-center gap-5 relative z-10">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-3xl shrink-0 shadow-inner">
+                <i class="fa-brands fa-android"></i>
+            </div>
+            <div class="space-y-1">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                    <i class="fa-solid fa-wifi text-xs"></i> Suporte Offline Completo
+                </div>
+                <h3 class="text-xl font-extrabold text-white">Baixar Aplicativo Android (Acesso Offline)</h3>
+                <p class="text-slate-300 text-sm max-w-xl">
+                    Estude sem internet! Baixe as aulas, anexos em PDF, áudios e responda aos quizzes mesmo offline com sincronização automática.
+                </p>
+            </div>
+        </div>
+        <div class="relative z-10 shrink-0 w-full md:w-auto">
+            <a href="{% url 'courses:download_app' %}" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-sm px-6 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-emerald-900/40 transition-all transform hover:-translate-y-0.5">
+                <i class="fa-solid fa-download text-lg"></i>
+                <span>Baixar APK Instalável</span>
+            </a>
         </div>
     </div>
 

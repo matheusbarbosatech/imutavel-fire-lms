@@ -3,9 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from apps.courses.api_views import download_app_view
+
 urlpatterns = [
     # A Landing Page ('') e a Gestão ('dashboard/') ficam centralizadas aqui:
     path('', include('apps.management.urls')),
+    path('download-app/', download_app_view, name='download_app_root'),
     
     # Demais módulos
     path('admin/', admin.site.urls),
